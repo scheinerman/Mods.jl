@@ -1,7 +1,7 @@
 module Mods
 
 import Base.isequal, Base.==, Base.+, Base.-, Base.*
-import Base.inv, Base./
+import Base.inv, Base./, Base.^
 
 export Mod
 export isequal, ==, +, -, *
@@ -67,5 +67,16 @@ function /(x::Mod, y::Mod)
     return x * inv(y)
 end
 
+function ^(x::Mod, k::Integer)
+    if k>0
+        return Base.^(x,k)
+    end
+    if k==0
+        T = typeof(x.val)
+        return Mod( one(T), x.mod )
+    end
+    y = inv(x)
+    return Base.^(y,-k)
+end
 
 end # end of module Mods
