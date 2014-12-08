@@ -5,7 +5,7 @@ import Base.inv, Base./, Base.^
 
 export Mod
 export isequal, ==, +, -, *
-export is_invertible, inv, /
+export is_invertible, inv, /, ^
 
 immutable Mod
     val
@@ -69,14 +69,14 @@ end
 
 function ^(x::Mod, k::Integer)
     if k>0
-        return Base.^(x,k)
+        return Mod(powermod(x.val, k, x.mod), x.mod)
     end
     if k==0
         T = typeof(x.val)
-        return Mod( one(T), x.mod )
+        return Mod(one(T), x.mod)
     end
     y = inv(x)
-    return Base.^(y,-k)
+    return y^(-k)
 end
 
 end # end of module Mods
