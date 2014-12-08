@@ -8,8 +8,8 @@ export isequal, ==, +, -, *
 export is_invertible, inv, /, ^
 
 immutable Mod
-    val
-    mod
+    val::Integer
+    mod::Integer
     function Mod{T <: Integer}(a::T, m::T)
         if m < 2
             error("Modulus must be at least 2")
