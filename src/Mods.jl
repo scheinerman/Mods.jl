@@ -13,8 +13,8 @@ immutable Mod
     val::Integer
     mod::Integer
     function Mod(a::Integer, m::Integer)
-        if m < 2
-            error("Modulus must be at least 2")
+        if m < 1
+            error("Modulus must be at least 1")
         end
 
         typeA = typeof(a)
@@ -119,12 +119,22 @@ end
 
 
 
-# private helper function (not really working yet!!!)
+# private helper function
 function CRT_work(x::Mod, y::Mod)
-    if gcd(x.mod, y.mod) != 1
+    n = x.mod
+    m = y.mod
+    if gcd(n,m) != 1
         error("Moduli must be pairwise relatively prime")
     end
-    return Mod(x.mod * y.mod)
+
+    a = x.val
+    b = y.val
+
+    k = inv(Mod(n,m)) * (b-a)
+
+    z = a + k.val*n
+
+    return Mod(z, n*m)
 end
 
 
