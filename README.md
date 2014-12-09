@@ -84,7 +84,7 @@ julia> -x
 Mod(7,10)
 ```
 
-#### Mixed Integer/Mod arithmetic
+### Mixed Integer/Mod arithmetic
 
 The basic four operations may also be performed between a `Mod` object
 and an `Integer`. The calculation proceeds as if the `Integer` has the
