@@ -4,7 +4,8 @@ Easy modular arithmetic for Julia.
 
 Construct an immutable `Mod` object with `Mod(val,mod)`.  Both `val`
 and `mod` must `Integer` values.
-```julia julia> using Mods
+```julia 
+julia> using Mods
 
 julia> Mod(4,23)
 Mod(4,23)
