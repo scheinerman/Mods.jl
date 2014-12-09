@@ -2,11 +2,9 @@
 
 Easy modular arithmetic for Julia.
 
-
-After `using Mods`, construct a `Mod` object with `Mod(val,mod)`.
-Both `val` and `mod` must `Integer` values.
-```julia
-julia> using Mods
+Construct an immutable `Mod` object with `Mod(val,mod)`.  Both `val`
+and `mod` must `Integer` values.
+```julia julia> using Mods
 
 julia> Mod(4,23)
 Mod(4,23)
@@ -133,6 +131,31 @@ ERROR: Mod(5,100) is not invertible
 julia> Mod(0,10)^0
 Mod(1,10)
 ```
+
+### Equality and hashing
+
+Two `Mod` objects can be compared for equality with either `==` or
+`isequal`.
+```julia
+julia> Mod(3,10) == Mod(3,11);
+false
+
+julia> Mod(3,10) == Mod(-7,10)
+true
+```
+
+We also define `hash` for `Mod` objects so they can be stored in sets
+and used as keys in a dictionary.
+```julia
+julia> A = Set{Mod}()
+Set{Mod}({})
+
+julia> push!(A, Mod(3,10))
+Set{Mod}({Mod(3,10)})
+```
+
+
+
 
 
 ## To Do List

@@ -2,10 +2,12 @@ module Mods
 
 import Base.isequal, Base.==, Base.+, Base.-, Base.*
 import Base.inv, Base./, Base.^
+import Base.hash
 
 export Mod
 export isequal, ==, +, -, *
 export is_invertible, inv, /, ^
+export hash
 
 immutable Mod
     val::Integer
@@ -31,6 +33,12 @@ immutable Mod
 end
 
 Mod(m::Integer) = Mod(0,m)
+
+function hash(x::Mod, h::Uint64= uint64(0))
+    v = BigInt(x.val)
+    m = BigInt(x.mod)
+    return hash(v,hash(m,h))
+end
 
 # Test for equality
 isequal(x::Mod, y::Mod) = x.mod==y.mod && x.val==y.val
