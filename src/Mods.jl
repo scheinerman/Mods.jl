@@ -10,14 +10,27 @@ export is_invertible, inv, /, ^
 immutable Mod
     val::Integer
     mod::Integer
-    function Mod{T <: Integer}(a::T, m::T)
+    function Mod(a::Integer, m::Integer)
         if m < 2
             error("Modulus must be at least 2")
         end
-        a = mod(a,m)
-        new(a,m)
+
+        typeA = typeof(a)
+        typeM = typeof(m)
+
+        if typeA == typeM
+            return new(mod(a,m),m)
+        end
+        
+        aa = a + zero(typeA) + zero(typeM)
+        mm = m + zero(typeA) + zero(typeM)
+        
+        aa = mod(aa,mm)
+        new(aa,mm)
     end
 end
+
+Mod(m::Integer) = Mod(0,m)
 
 # Test for equality
 isequal(x::Mod, y::Mod) = x.mod==y.mod && x.val==y.val
@@ -78,5 +91,19 @@ function ^(x::Mod, k::Integer)
     y = inv(x)
     return y^(-k)
 end
+
+# Operations with Integers
+
++(x::Mod, k::Integer) = Mod(x.val+k, x.mod)
++(k::Integer, x::Mod) = Mod(x.val+k, x.mod)
+    
+-(x::Mod, k::Integer) = Mod(x.val-k, x.mod)
+-(k::Integer, x::Mod) = Mod(k-x.val, x.mod)
+
+*(x::Mod, k::Integer) = Mod(k*x.val, x.mod)
+*(k::Integer, x::Mod) = Mod(k*x.val, x.mod)
+
+/(x::Mod, k::Integer) = x / Mod(k, x.mod)
+/(k::Integer, x::Mod) = Mod(k, x.mod) / x
 
 end # end of module Mods
