@@ -23,10 +23,10 @@ immutable Mod
         if typeA == typeM
             return new(mod(a,m),m)
         end
-        
+
         aa = a + zero(typeA) + zero(typeM)
         mm = m + zero(typeA) + zero(typeM)
-        
+
         aa = mod(aa,mm)
         new(aa,mm)
     end
@@ -59,7 +59,7 @@ end
 
 function -(x::Mod,y::Mod)
     modcheck(x,y)
-    return (x.val-y.val, x.mod)
+    return Mod(x.val-y.val, x.mod)
 end
 
 function -(x::Mod)
@@ -104,7 +104,7 @@ end
 
 +(x::Mod, k::Integer) = Mod(x.val+k, x.mod)
 +(k::Integer, x::Mod) = Mod(x.val+k, x.mod)
-    
+
 -(x::Mod, k::Integer) = Mod(x.val-k, x.mod)
 -(k::Integer, x::Mod) = Mod(k-x.val, x.mod)
 
