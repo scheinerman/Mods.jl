@@ -114,4 +114,35 @@ end
 /(x::Mod, k::Integer) = x / Mod(k, x.mod)
 /(k::Integer, x::Mod) = Mod(k, x.mod) / x
 
+
+# Chinese remainder theorem
+
+
+
+# private helper function (not really working yet!!!)
+function CRT_work(x::Mod, y::Mod)
+    if gcd(x.mod, y.mod) != 1
+        error("Moduli must be pairwise relatively prime")
+    end
+    return Mod(x.mod * y.mod)
+end
+
+
+# public interface
+function CRT(mtuple::Mod...)
+    n = length(mtuple)
+    if n == 0
+        return Mod(1)
+    end
+
+    result::Mod = mtuple[1]
+
+    for k=2:n
+        result = CRT_work(result,mtuple[k])
+    end
+
+    return result
+end
+
+
 end # end of module Mods
