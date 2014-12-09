@@ -7,7 +7,7 @@ import Base.hash
 export Mod
 export isequal, ==, +, -, *
 export is_invertible, inv, /, ^
-export hash
+export hash, CRT
 
 immutable Mod
     val::Integer
