@@ -156,9 +156,107 @@ Set{Mod}({Mod(3,10)})
 ```
 
 
+### Chinese Remainder Theorem calculations
+
+The Chinese Remainder Theorem gives a solution to the following
+problem. Given integers `a, b, m, n` with `gcd(m,n)==1` find an
+integer `x` such that `mod(x,m)==mod(a,m)` and
+`mod(x,n)==mod(b,n)`. We provide the `CRT` function to solve this
+problem as illustrated here with `a=3`, `m=10`, `b=5`, and `n=17`:
+
+```julia
+julia> s = Mod(3,10); t = Mod(5,17);
+
+julia> CRT(s,t)
+Mod(73,170)
+```
+
+We find that `mod(73,10)` equals `3` and `mod(73,17)` equals `5` as
+required. The answer is reported as `Mod(73,170)` because any value of
+`x` congruent to 73 modulo 170 is a solution.
+
+The `CRT` function can be applied to any number of arguments so long
+as their moduli are pairwise relatively prime. If called with no
+arguments, `CRT` returns `Mod(0,1)` since all integers are congruent
+to 0 modulo 1.
+
+## Technical details
+
+`Mod` objects contain two fields `:val` and `:mod` that are both
+`Integer` types. When constructed with standard values, these are
+`Int64` values. Two `Mod` objects may still compare as equal even if
+their underlying values of are different sorts of `Integer` values.
+
+```julia
+julia> x = Mod(3,100)
+Mod(3,100)
+
+julia> typeof(x.val)
+Int64
+
+julia> y = Mod(3,BigInt(100))
+Mod(3,100)
+
+julia> typeof(y.val)
+BigInt (constructor with 10 methods)
+
+julia> x==y
+true
+
+julia> hash(x)
+0x88de37e7d9774f69
+
+julia> hash(y)
+0x88de37e7d9774f69
+```
+
+Operating with `Mod` values whose underlying datatypes are different
+is permitted and the resulting data will be the more generous type.
 
 
+```julia
+julia> x = Mod(3,100)
+Mod(3,100)
 
-## To Do List
+julia> typeof(x.val)
+Int64
 
-* Implement Chinese Remainder Theorem calculations.
+julia> x += 758940723598072490875903487598024769807980572439847523498799
+Mod(2,100)
+
+julia> typeof(x.val)
+BigInt (constructor with 10 methods)
+```
+
+Automatic promotion of `Integer` type only occurs when the operation
+involes two different types of `Integer`. If the modulus is too close
+to the largest possible positive value for a given sort of `Integer`
+then incorrect results may emerge. Here's an example:
+
+```julia
+julia> x = Mod(-1, 2^63-1)
+Mod(9223372036854775806,9223372036854775807)
+
+julia> typeof(x.val)
+Int64
+
+julia> x*x
+Mod(4,9223372036854775807)  # should be Mod(1,922...807)
+```
+
+The answer, of course, should be `1` in the given modulus. When
+dealing with large values, it's safest to use `BigInt` storage, like
+this:
+
+```julia
+julia> x = Mod(BigInt(-1), 2^63-1)
+Mod(9223372036854775806,9223372036854775807)
+
+julia> typeof(x.val)
+BigInt (constructor with 10 methods)
+
+julia> x*x
+Mod(1,9223372036854775807)  # this is correct
+```
+
+
