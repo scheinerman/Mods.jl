@@ -229,7 +229,7 @@ BigInt (constructor with 10 methods)
 ```
 
 Automatic promotion of `Integer` type only occurs when the operation
-involes two different types of `Integer`. If the modulus is too close
+involves two different types of `Integer`. If the modulus is too close
 to the largest possible positive value for a given sort of `Integer`
 then incorrect results may emerge. Here's an example:
 
