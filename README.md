@@ -4,7 +4,7 @@ Easy modular arithmetic for Julia.
 
 Construct an immutable `Mod` object with `Mod(val,mod)`.  Both `val`
 and `mod` must `Integer` values.
-```julia 
+```julia
 julia> using Mods
 
 julia> Mod(4,23)
@@ -59,7 +59,7 @@ ERROR: Cannot operate on two Mod objects with different moduli
 Division can result in an error if the divisor is not invertible. A
 `Mod` object `x` can be checked for invertibility using
 `is_invertible(x)`. To find the inverse of `x` (assuming it exists)
-use `inv(x)`.
+use `inv(x)` or `x'`.
 ```julia
 julia> x = Mod(8,10); y = Mod(6,10);
 
@@ -112,7 +112,7 @@ Mod(9,10)
 Use `x^k` to raise a `Mod` object `x` to an `Integer` power `k`. If
 `k` is zero, this always returns `Mod(1,m)` where `m` is the modulus
 of `x`. Negative exponentiation succeeds if and only if `x` is
-invertible. 
+invertible.
 ```julia
 julia> x = Mod(3,100)
 Mod(3,100)

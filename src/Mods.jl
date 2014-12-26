@@ -6,7 +6,7 @@ import Base.hash
 
 export Mod
 export isequal, ==, +, -, *
-export is_invertible, inv, /, ^
+export is_invertible, inv, /, ^, ctranspose
 export hash, CRT
 
 immutable Mod
@@ -82,6 +82,10 @@ function inv(x::Mod)
     end
     return Mod(v, x.mod)
 end
+
+# Typing shortcut for inv(x)
+ctranspose(x::Mod) = inv(x)
+
 
 function /(x::Mod, y::Mod)
     modcheck(x,y)
