@@ -118,10 +118,15 @@ end
 /(x::Mod, k::Integer) = x / Mod(k, x.mod)
 /(k::Integer, x::Mod) = Mod(k, x.mod) / x
 
+# Comparison with Integers
 
-# Chinese remainder theorem
+isequal(x::Mod, k::Integer) = mod(k,x.mod) == x.val
+isequal(k::Integer, x::Mod) = isequal(x,k)
+==(x::Mod, k::Integer) = isequal(x,k)
+==(k::Integer, x::Mod) = isequal(x,k)
 
 
+# Chinese remainder theorem functions
 
 # private helper function
 function CRT_work(x::Mod, y::Mod)
@@ -140,7 +145,6 @@ function CRT_work(x::Mod, y::Mod)
 
     return Mod(z, n*m)
 end
-
 
 # public interface
 function CRT(mtuple::Mod...)

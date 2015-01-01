@@ -145,6 +145,16 @@ julia> Mod(3,10) == Mod(-7,10)
 true
 ```
 
+We can also compare `Mod` objects with `Integer` objects:
+```julia
+julia> Mod(3,10) == -7
+true
+
+julia> Mod(3,10) == 7
+false
+```
+
+
 We also define `hash` for `Mod` objects so they can be stored in sets
 and used as keys in a dictionary.
 ```julia
