@@ -2,7 +2,7 @@ module Mods
 
 import Base.isequal, Base.==, Base.+, Base.-, Base.*
 import Base.inv, Base./, Base.^
-import Base.hash
+import Base.hash, Base.ctranspose
 
 export Mod
 export isequal, ==, +, -, *
@@ -34,7 +34,7 @@ end
 
 Mod(m::Integer) = Mod(0,m)
 
-function hash(x::Mod, h::Uint64= uint64(0))
+function hash(x::Mod, h::UInt64= UInt64(0))
     v = BigInt(x.val)
     m = BigInt(x.mod)
     return hash(v,hash(m,h))
@@ -75,6 +75,9 @@ end
 
 is_invertible(x::Mod) = return gcd(x.val,x.mod)==1
 
+"""
+`inv(x::Mod)` gives the multiplicative inverse of `x`.
+"""
 function inv(x::Mod)
     (g, v, ignore) = gcdx(x.val, x.mod)
     if g != 1
@@ -147,6 +150,19 @@ function CRT_work(x::Mod, y::Mod)
 end
 
 # public interface
+"""
+`CRT(m1,m2,...)`: Chinese Remainder Theorem
+```
+julia> CRT( Mod(4,11), Mod(8,14) )
+Mods.Mod(92,154)
+
+julia> 92%11
+4
+
+julia> 92%14
+8
+```
+"""
 function CRT(mtuple::Mod...)
     n = length(mtuple)
     if n == 0
