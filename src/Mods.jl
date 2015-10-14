@@ -72,7 +72,9 @@ function *(x::Mod, y::Mod)
 end
 
 # Division stuff
-
+"""
+`is_invertible(x::Mod)` determines if `x` is invertible.
+"""
 is_invertible(x::Mod) = return gcd(x.val,x.mod)==1
 
 """
@@ -127,7 +129,6 @@ isequal(x::Mod, k::Integer) = mod(k,x.mod) == x.val
 isequal(k::Integer, x::Mod) = isequal(x,k)
 ==(x::Mod, k::Integer) = isequal(x,k)
 ==(k::Integer, x::Mod) = isequal(x,k)
-
 
 # Chinese remainder theorem functions
 
