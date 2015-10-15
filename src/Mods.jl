@@ -2,13 +2,17 @@ module Mods
 
 import Base.isequal, Base.==, Base.+, Base.-, Base.*
 import Base.inv, Base./, Base.^
-import Base.hash, Base.ctranspose
+import Base.hash, Base.ctranspose, Base.show
 
 export Mod
 export isequal, ==, +, -, *
 export is_invertible, inv, /, ^, ctranspose
 export hash, CRT
 
+"""
+`Mod(v,m)` creates a modular number in mod `m` with value `v%m`.
+`Mod(m)` is equivalent to `Mod(0,m)`.
+"""
 immutable Mod
     val::Integer
     mod::Integer
@@ -79,6 +83,7 @@ is_invertible(x::Mod) = return gcd(x.val,x.mod)==1
 
 """
 `inv(x::Mod)` gives the multiplicative inverse of `x`.
+This may be abbreviated by `x'`.
 """
 function inv(x::Mod)
     (g, v, ignore) = gcdx(x.val, x.mod)
@@ -179,5 +184,7 @@ function CRT(mtuple::Mod...)
     return result
 end
 
+
+show(io::IO, m::Mod) = print(io,"Mod(",m.val,",",m.mod,")")
 
 end # end of module Mods
