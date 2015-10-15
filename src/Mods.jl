@@ -79,7 +79,7 @@ end
 """
 `is_invertible(x::Mod)` determines if `x` is invertible.
 """
-is_invertible(x::Mod) = return gcd(x.val,x.mod)==1
+is_invertible(x::Mod) = return gcd(x.val,x.mod)==1 && x.mod>1
 
 """
 `inv(x::Mod)` gives the multiplicative inverse of `x`.
@@ -87,7 +87,7 @@ This may be abbreviated by `x'`.
 """
 function inv(x::Mod)
     (g, v, ignore) = gcdx(x.val, x.mod)
-    if g != 1
+    if g != 1 || x.mod==1
         error(x, " is not invertible")
     end
     return Mod(v, x.mod)
