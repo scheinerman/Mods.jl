@@ -13,7 +13,7 @@ export hash, CRT
 `Mod(v,m)` creates a modular number in mod `m` with value `v%m`.
 `Mod(m)` is equivalent to `Mod(0,m)`.
 """
-immutable Mod
+struct Mod
     val::Integer
     mod::Integer
     function Mod(a::Integer, m::Integer)
