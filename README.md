@@ -1,5 +1,13 @@
 # Mods
 
+
+[![Build Status](https://travis-ci.org/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.org/scheinerman/Mods.jl)
+
+[![Coverage Status](https://coveralls.io/repos/scheinerman/Mods.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/scheinerman/Mods.jl?branch=master)
+
+[![codecov.io](http://codecov.io/github/scheinerman/Mods.jl/coverage.svg?branch=master)](http://codecov.io/github/scheinerman/Mods.jl?branch=master)
+
+
 Easy modular arithmetic for Julia.
 
 Construct an immutable `Mod` object with `Mod(val,mod)`.  Both `val`
@@ -268,5 +276,3 @@ BigInt (constructor with 10 methods)
 julia> x*x
 Mod(1,9223372036854775807)  # this is correct
 ```
-
-
