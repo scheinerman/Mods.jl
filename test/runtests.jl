@@ -17,3 +17,4 @@ b = Mod(32,q)
 x = CRT(a,b)
 @test Mod(x.val,p)==a
 @test Mod(x.val,q)==b
+@test a'*a == 1

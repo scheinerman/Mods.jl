@@ -2,11 +2,11 @@ module Mods
 
 import Base.isequal, Base.==, Base.+, Base.-, Base.*
 import Base.inv, Base./, Base.^
-import Base.hash, Base.ctranspose, Base.show
+import Base.hash, Base.adjoint, Base.show
 
 export Mod
 export isequal, ==, +, -, *
-export is_invertible, inv, /, ^, ctranspose
+export is_invertible, inv, /, ^
 export hash, CRT
 
 """
@@ -94,7 +94,7 @@ function inv(x::Mod)
 end
 
 # Typing shortcut for inv(x)
-ctranspose(x::Mod) = inv(x)
+adjoint(x::Mod) = inv(x)
 
 
 function /(x::Mod, y::Mod)
