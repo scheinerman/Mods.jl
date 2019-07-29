@@ -19,3 +19,18 @@ x = CRT(a,b)
 @test Mod(x.val,p)==a
 @test Mod(x.val,q)==b
 @test inv(a)*a == 1
+
+p = 9223372036854775783   # This is a big prime
+x = Mod(-2,p)
+@test x*x == 4
+@test x+x == -4
+@test x/x == 1
+@test x^4 == 16
+@test x^(p-1) == 1   # Fermat Little Theorem test
+@test 2x == x+x
+@test x-x == 0
+y = inv(x)
+@test x*y == 1
+@test x+p == x
+@test x*p == 0
+@test p-x == x-2x
