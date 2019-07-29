@@ -2,7 +2,7 @@ module Mods
 
 import Base.isequal, Base.==, Base.+, Base.-, Base.*
 import Base.inv, Base./, Base.^
-import Base.hash, Base.adjoint, Base.show
+import Base.hash, Base.show
 
 export Mod
 export isequal, ==, +, -, *
@@ -13,26 +13,16 @@ export hash, CRT
 `Mod(v,m)` creates a modular number in mod `m` with value `v%m`.
 `Mod(m)` is equivalent to `Mod(0,m)`.
 """
-struct Mod
-    val::Integer
-    mod::Integer
-    function Mod(a::Integer, m::Integer)
+struct Mod{T<:Integer}
+    val::T
+    mod::T
+    function Mod(a::S, m::T) where {S<:Integer, T<:Integer}
         if m < 1
             error("Modulus must be at least 1")
         end
 
-        typeA = typeof(a)
-        typeM = typeof(m)
-
-        if typeA == typeM
-            return new(mod(a,m),m)
-        end
-
-        aa = a + zero(typeA) + zero(typeM)
-        mm = m + zero(typeA) + zero(typeM)
-
-        aa = mod(aa,mm)
-        new(aa,mm)
+        a,m = promote(a,m)
+        return new{typeof(a)}(mod(a,m),m)
     end
 end
 
@@ -94,7 +84,7 @@ function inv(x::Mod)
 end
 
 # Typing shortcut for inv(x)
-# adjoint(x::Mod)  
+# adjoint(x::Mod)
 
 function /(x::Mod, y::Mod)
     modcheck(x,y)
