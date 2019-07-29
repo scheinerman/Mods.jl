@@ -94,8 +94,7 @@ function inv(x::Mod)
 end
 
 # Typing shortcut for inv(x)
-adjoint(x::Mod) = inv(x)
-
+# adjoint(x::Mod)  
 
 function /(x::Mod, y::Mod)
     modcheck(x,y)

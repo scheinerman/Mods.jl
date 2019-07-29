@@ -9,6 +9,7 @@ p = 23
 @test Mod(17,p) * inv(Mod(17,p)) == Mod(1,p)
 @test Mod(17^6,p)==Mod(17,p)^6
 @test Mod(17,p)^(-2) == inv(Mod(17,p))^2
+@test Mod(17,p) == 17
 
 q = 91
 a = Mod(17,p)
@@ -17,4 +18,4 @@ b = Mod(32,q)
 x = CRT(a,b)
 @test Mod(x.val,p)==a
 @test Mod(x.val,q)==b
-@test a'*a == 1
+@test inv(a)*a == 1

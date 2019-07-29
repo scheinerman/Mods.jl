@@ -67,7 +67,8 @@ ERROR: Cannot operate on two Mod objects with different moduli
 Division can result in an error if the divisor is not invertible. A
 `Mod` object `x` can be checked for invertibility using
 `is_invertible(x)`. To find the inverse of `x` (assuming it exists)
-use `inv(x)` or `x'`.
+use `inv(x)`. **WARNING**: The syntax `x'` is no longer valid for finding
+the inverse of `x`.
 ```julia
 julia> x = Mod(8,10); y = Mod(6,10);
 
