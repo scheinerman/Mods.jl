@@ -48,21 +48,32 @@ end
 # Easy arithmetic
 function +(x::Mod, y::Mod)
     modcheck(x,y)
-    return Mod(x.val+y.val, x.mod)
+    s,flag = Base.add_with_overflow(x.val,y.val)
+    if !flag
+        return Mod(x.val+y.val, x.mod)
+    end
+    s = widen(x.val) + widen(y.val)    # add with added precision
+    s = mod(s,x.mod)                   # reduce by modulus
+    return Mod(oftype(x.mod,s),x.mod)  # return with proper type
 end
 
-function -(x::Mod,y::Mod)
-    modcheck(x,y)
-    return Mod(x.val-y.val, x.mod)
-end
 
 function -(x::Mod)
     return Mod(-x.val, x.mod)
 end
 
+-(x::Mod,y::Mod) = x + (-y)
+
+
 function *(x::Mod, y::Mod)
     modcheck(x,y)
-    return Mod(x.val*y.val, x.mod)
+    p,flag = Base.mul_with_overflow(x.val,y.val)
+    if !flag
+        return Mod(x.val*y.val, x.mod)
+    end
+    p = widemul(x.val, y.val)         # multipy with added precision
+    p = mod(p,x.mod)                  # reduce by the modulus
+    return Mod(oftype(x.mod,p),x.mod) # return with proper type
 end
 
 # Division stuff
@@ -105,14 +116,14 @@ end
 
 # Operations with Integers
 
-+(x::Mod, k::Integer) = Mod(x.val+k, x.mod)
-+(k::Integer, x::Mod) = Mod(x.val+k, x.mod)
++(x::Mod, k::Integer) = Mod(k,x.mod)+x
++(k::Integer, x::Mod) = x+k
 
--(x::Mod, k::Integer) = Mod(x.val-k, x.mod)
--(k::Integer, x::Mod) = Mod(k-x.val, x.mod)
+-(x::Mod, k::Integer) = x + (-k)
+-(k::Integer, x::Mod) = (-x) + k
 
-*(x::Mod, k::Integer) = Mod(k*x.val, x.mod)
-*(k::Integer, x::Mod) = Mod(k*x.val, x.mod)
+*(x::Mod, k::Integer) = Mod(k,x.mod) * x
+*(k::Integer, x::Mod) = x*k
 
 /(x::Mod, k::Integer) = x / Mod(k, x.mod)
 /(k::Integer, x::Mod) = Mod(k, x.mod) / x
