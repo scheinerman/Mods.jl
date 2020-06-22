@@ -2,7 +2,7 @@ name = "Mods"
 uuid = "7475f97c-0381-53b1-977b-4c60186c8d62"
 
 [compat]
-julia = "≥ 0.7.0"
+julia = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
