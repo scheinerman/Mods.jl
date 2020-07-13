@@ -2,6 +2,7 @@ module Mods
 
 
 import Base: isequal, (==), (+), (-), (*), (inv), (/), (^), hash, show
+import Base: zero, one
 
 export Mod, modulus, value
 export isequal, ==, +, -, *, is_invertible, inv, /, ^
@@ -25,6 +26,11 @@ Mod{N}(x::Int=0) where N = Mod(x,N)
 modulus(a::Mod{N}) where N = N
 value(a::Mod{N}) where N = a.val
 
+zero(::Mod{N}) where N = Mod{N}()
+zero(::Type{Mod{N}}) where N = Mod{N}()
+
+one(::Mod{N}) where N = Mod{N}(1)
+one(::Type{Mod{N}}) where N = Mod{N}(1)
 
 function hash(x::Mod, h::UInt64= UInt64(0))
     v = BigInt(value(x))

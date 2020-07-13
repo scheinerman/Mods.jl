@@ -11,6 +11,8 @@ p = 23
 @test Mod(17,p)^(-2) == inv(Mod(17,p))^2
 @test Mod(17,p) == 17
 
+@test Mod{p}(22) == Mod(22,p)
+
 q = 91
 a = Mod(17,p)
 b = Mod(32,q)
@@ -34,3 +36,10 @@ y = inv(x)
 @test x+p == x
 @test x*p == 0
 @test p-x == x-2x
+
+
+M = zeros(Mod{11},3,3)
+@test sum(M) == 0
+
+M = ones(Mod{11},5,5)
+@test sum(M) == 3
