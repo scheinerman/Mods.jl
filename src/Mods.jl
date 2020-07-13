@@ -15,7 +15,7 @@ export hash, CRT
 struct Mod{N} <: Number
     val::Int
     function Mod(x::Int,N::Int)
-        @assert N>1 ""
+        @assert N>1 "modulus must be at least 2"
         new{N::Int}(mod(x,N))
     end
 end

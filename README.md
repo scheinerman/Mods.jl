@@ -5,6 +5,8 @@ Modular arithmetic for Julia.
 ---
 ## **ALERT**: This is a new version
 
+### Release notes
+
 This is a new version of the `Mods` module. Old code might not function.
 The old constructor `Mod(a,m)` has been replaced by `Mod{m}(a)` (although the
 old version still works). The advantage is that now `Mod{n}` is a type and
@@ -23,9 +25,9 @@ julia> Mod{5}.(1:6)
 The old version did not have a function to recover the value and the
 modulus of a `Mod` value `x`. The kludge was to use `x.val` and `x.mod`.
 In this version, the functions `value(x)` and `modulus(x)` are provided.
+[`x.val` still works (although it should be avoided), but `x.mod` does not.]
 
 ---
-
 
 [![Build Status](https://travis-ci.org/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.org/scheinerman/Mods.jl)
 
@@ -37,8 +39,8 @@ Objects of type `Mod` are a type of `Number`. In particular, `Mod{N}`
 represents values in the set `{0,1,2,...,N-1}` with all operations
 evaluated modulo `N`.
 
-Construct an immutable `Mod` object with `Mod{N}(val)`.  Both `val`
-and `N` must `Int` values.
+Construct a `Mod` object with `Mod{N}(val)`.  Both `val`
+and `N` must be `Int` values.
 ```
 julia> using Mods
 
@@ -53,6 +55,12 @@ Mod{12}(3)
 
 julia> x = Mod(4,10)
 Mod(4,10)
+```
+
+The smallest allowable modulus is 2:
+```
+julia> Mod{-4}(1)
+ERROR: AssertionError: modulus must be at least 2
 ```
 
 The functions `modulus` and `value` are used to recover the
@@ -86,9 +94,7 @@ julia> zeros(Mod{7},3,5)
  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
-
 ```
-
 
 
 ## Operations
@@ -144,7 +150,7 @@ Mod{10}(7)
 ### Mixed Integer/Mod arithmetic
 
 The basic four operations may also be performed between a `Mod` object
-and an integer. The calculation proceeds as if the `Integer` has the
+and an integer. The calculation proceeds as if the integer has the
 same modulus as the `Mod` object.
 ```
 julia> x = Mod{10}(3);
@@ -168,7 +174,7 @@ Mod{10}(9)
 ### Exponentiation
 
 Use `x^k` to raise a `Mod` object `x` to an integer power `k`. If
-`k` is zero, this always returns `Mod(1,m)` where `m` is the modulus
+`k` is zero, this always returns `Mod{m}(1)` where `m` is the modulus
 of `x`. Negative exponentiation succeeds if and only if `x` is
 invertible.
 ```
