@@ -1,5 +1,14 @@
 # Mods
 
+## Important Notice: Breaking changes coming!
+
+I plan to reimplement this module so that a mod-N number is represented
+as `Mod{N}(x)` instead of `Mod(N,x)`. In this way `Mod{N}` becomes a type.
+
+I will release this new implementation with version numbers of the form 1.x.x
+to signify the break with the previous implementation (versions 0.x.x).
+
+
 
 [![Build Status](https://travis-ci.org/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.org/scheinerman/Mods.jl)
 
