@@ -1,54 +1,94 @@
 # Mods
 
-## Important Notice: Breaking changes coming!
+Modular arithmetic for Julia.
 
-I plan to reimplement this module so that a mod-N number is represented
-as `Mod{N}(x)` instead of `Mod(N,x)`. In this way `Mod{N}` becomes a type.
+---
+## **ALERT**: This is a new version
 
-I will release this new implementation with version numbers of the form 1.x.x
-to signify the break with the previous implementation (versions 0.x.x).
+This is a new version of the `Mods` module. Old code might not function.
+The old constructor `Mod(a,m)` has been replaced by `Mod{m}(a)` (although the
+old version still works). The advantage is that now `Mod{n}` is a type and
+so can be used in broadcasting:
+```
+julia> Mod{5}.(1:6)
+6-element Array{Mod{5},1}:
+ Mod{5}(1)
+ Mod{5}(2)
+ Mod{5}(3)
+ Mod{5}(4)
+ Mod{5}(0)
+ Mod{5}(1)
+```
 
+The old version did not have a function to recover the value and the
+modulus of a `Mod` value `x`. The kludge was to use `x.val` and `x.mod`.
+In this version, the functions `value(x)` and `modulus(x)` are provided.
+
+---
 
 
 [![Build Status](https://travis-ci.org/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.org/scheinerman/Mods.jl)
 
-[![Coverage Status](https://coveralls.io/repos/scheinerman/Mods.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/scheinerman/Mods.jl?branch=master)
-
 [![codecov.io](http://codecov.io/github/scheinerman/Mods.jl/coverage.svg?branch=master)](http://codecov.io/github/scheinerman/Mods.jl?branch=master)
 
+## Basics
 
-Easy modular arithmetic for Julia.
+Objects of type `Mod` are a type of `Number`. In particular, `Mod{N}`
+represents values in the set `{0,1,2,...,N-1}` with all operations
+evaluated modulo `N`.
 
-Construct an immutable `Mod` object with `Mod(val,mod)`.  Both `val`
-and `mod` must `Integer` values.
-```julia
+Construct an immutable `Mod` object with `Mod{N}(val)`.  Both `val`
+and `N` must `Int` values.
+```
 julia> using Mods
 
-julia> Mod(4,23)
-Mod(4,23)
+julia> Mod{23}(4)
+Mod{23}(4)
 
-julia> Mod(-1,23)
-Mod(22,23)
+julia> Mod{23}(-1)
+Mod{23}(22)
 
-julia> Mod(99,12)
-Mod(3,12)
+julia> Mod{12}(99)
+Mod{12}(3)
 
 julia> x = Mod(4,10)
 Mod(4,10)
+```
 
-julia> x.val
+The functions `modulus` and `value` are used to recover the
+relevant components of a `Mod` number
+```
+julia> x = Mod{10}(14)
+Mod{10}(4)
+
+julia> value(x)
 4
 
-julia> x.mod
+julia> modulus(x)
 10
 ```
 
-With just a single argument, `Mod` creates a zero element of the given
+With just no arguments, `Mod{N}` creates a zero element of the given
 modulus.
-```julia
-julia> Mod(17)
-Mod(0,17)
 ```
+julia> Mod{17}()
+Mod{17}(0)
+```
+
+The functions `zero`, `zeros`, `one`, and `ones` behave as for other
+`Number` types:
+```
+julia> one(Mod{19})
+Mod{19}(1)
+
+julia> zeros(Mod{7},3,5)
+3×5 Array{Mod{7},2}:
+ Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
+ Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
+ Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
+
+```
+
 
 
 ## Operations
@@ -57,69 +97,69 @@ Mod(0,17)
 
 `Mod` objects can be added, subtracted, mulitplied, and divided with
 one another. The two `Mod` operands must have the same modulus.
-```julia
-julia> x = Mod(8,10); y = Mod(6,10);
+```
+ulia> x = Mod{10}(8); y = Mod{10}(6);
 
 julia> x+y
-Mod(4,10)
+Mod{10}(4)
 
-julia> x-y
-(2,10)
+julia> y-x
+Mod{10}(8)
+
 
 julia> x*y
-Mod(8,10)
+Mod{10}(8)
 
-julia> Mod(5,10) + Mod(5,11)
+julia> Mod{10}(5) + Mod{11}(5)
 ERROR: Cannot operate on two Mod objects with different moduli
 ```
 
 Division can result in an error if the divisor is not invertible. A
 `Mod` object `x` can be checked for invertibility using
 `is_invertible(x)`. To find the inverse of `x` (assuming it exists)
-use `inv(x)`. **WARNING**: The syntax `x'` is no longer valid for finding
-the inverse of `x`.
-```julia
-julia> x = Mod(8,10); y = Mod(6,10);
+use `inv(x)`.
 
-julia> x/y
-ERROR: Mod(6,10) is not invertible
-
-julia> x = Mod(8,10); y = Mod(3,10);
+```
+julia> x = Mod{10}(8); y = Mod{10}(3);
 
 julia> x/y
 Mod(6,10)
 
+julia> y/x
+ERROR: Mod{10}(8) is not invertible
+
 julia> inv(y)
-Mod(7,10)
+Mod{10}(7)
 ```
 
 We also support unary minus.
-```julia
-julia> x = Mod(3,10);
+```
+julia> x = Mod{10}(3)
+Mod{10}(3)
 
 julia> -x
-Mod(7,10)
+Mod{10}(7)
 ```
 
 ### Mixed Integer/Mod arithmetic
 
 The basic four operations may also be performed between a `Mod` object
-and an `Integer`. The calculation proceeds as if the `Integer` has the
+and an integer. The calculation proceeds as if the `Integer` has the
 same modulus as the `Mod` object.
-```julia
-julia> x = Mod(3,10);
+```
+julia> x = Mod{10}(3);
 
 julia> x+9
-Mod(2,10)
+Mod{10}(2)
 
 julia> 4x
-Mod(2,10)
+Mod{10}(2)
 
 julia> 3-x
-Mod(0,10)
+Mod{10}(0)
 
 julia> x/7
-Mod(9,10)
+Mod{10}(9)
 ```
 
 
@@ -127,61 +167,88 @@ Mod(9,10)
 
 ### Exponentiation
 
-Use `x^k` to raise a `Mod` object `x` to an `Integer` power `k`. If
+Use `x^k` to raise a `Mod` object `x` to an integer power `k`. If
 `k` is zero, this always returns `Mod(1,m)` where `m` is the modulus
 of `x`. Negative exponentiation succeeds if and only if `x` is
 invertible.
-```julia
-julia> x = Mod(3,100)
-Mod(3,100)
+```
+julia> x = Mod{100}(3)
+Mod{100}(3)
 
 julia> x^10
-Mod(49,100)
+Mod{100}(49)
 
 julia> x^-2
-Mod(89,100)
+Mod{100}(89)
 
-julia> x = Mod(5,100)
-Mod(5,100)
+julia> x = Mod{100}(5)
+Mod{100}(5)
 
 julia> x^-3
-ERROR: Mod(5,100) is not invertible
+ERROR: Mod{100}(5) is not invertible
 
-julia> Mod(0,10)^0
-Mod(1,10)
+julia> Mod{10}(0)^0
+Mod{10}(1)
 ```
 
 ### Equality and hashing
 
 Two `Mod` objects can be compared for equality with either `==` or
 `isequal`.
-```julia
-julia> Mod(3,10) == Mod(3,11);
+```
+julia> Mod{10}(3) == Mod{11}(3)
 false
 
-julia> Mod(3,10) == Mod(-7,10)
+julia> Mod{10}(3) == Mod{10}(-7)
 true
 ```
 
-We can also compare `Mod` objects with `Integer` objects:
-```julia
-julia> Mod(3,10) == -7
+We can also compare `Mod` objects with integer objects:
+```
+julia> Mod{10}(3) == -7
 true
 
-julia> Mod(3,10) == 7
+julia> Mod{10}(3) == 7
 false
 ```
 
 
 We also define `hash` for `Mod` objects so they can be stored in sets
 and used as keys in a dictionary.
-```julia
-julia> A = Set{Mod}()
-Set{Mod}({})
-
-julia> push!(A, Mod(3,10))
-Set{Mod}({Mod(3,10)})
 ```
+julia> A = Set{Mod}()
+Set{Mod} with 0 elements
+
+julia> push!(A,Mod{10}(3))
+Set{Mod} with 1 element:
+  Mod{10}(3)
+
+julia> push!(A,Mod{11}(3))
+Set{Mod} with 2 elements:
+  Mod{10}(3)
+  Mod{11}(3)
+```
+
+The container can be narrowed to a particular `Mod` and then
+we have this:
+```
+julia> B = Set{Mod{10}}()
+Set{Mod{10}} with 0 elements
+
+julia> push!(B,0)
+Set{Mod{10}} with 1 element:
+  Mod{10}(0)
+
+julia> push!(B,11)
+Set{Mod{10}} with 2 elements:
+  Mod{10}(0)
+  Mod{10}(1)
+
+julia> push!(B,Mod{11}(3))
+ERROR: MethodError: no method matching Mod{10}(::Mod{11})
+```
+The last input fails because `B` was defined to be a `Set`
+that holds `Mod{10}` objects only.
 
 
 ### Chinese Remainder Theorem calculations
@@ -192,11 +259,11 @@ integer `x` such that `mod(x,m)==mod(a,m)` and
 `mod(x,n)==mod(b,n)`. We provide the `CRT` function to solve this
 problem as illustrated here with `a=3`, `m=10`, `b=5`, and `n=17`:
 
-```julia
-julia> s = Mod(3,10); t = Mod(5,17);
+```
+julia> s = Mod{10}(3); t = Mod{17}(5);
 
 julia> CRT(s,t)
-Mod(73,170)
+Mod{170}(73)
 ```
 
 We find that `mod(73,10)` equals `3` and `mod(73,17)` equals `5` as
@@ -204,6 +271,4 @@ required. The answer is reported as `Mod(73,170)` because any value of
 `x` congruent to 73 modulo 170 is a solution.
 
 The `CRT` function can be applied to any number of arguments so long
-as their moduli are pairwise relatively prime. If called with no
-arguments, `CRT` returns `Mod(0,1)` since all integers are congruent
-to 0 modulo 1.
+as their moduli are pairwise relatively prime.

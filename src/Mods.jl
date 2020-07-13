@@ -12,7 +12,7 @@ export hash, CRT
 `Mod{m}(v)` (and also `Mod(v,m)`) creates a modular number in mod `m` with value `v%m`.
 `Mod{m}()` is equivalent to `Mod(0,m)`.
 """
-struct Mod{N}
+struct Mod{N} <: Number
     val::Int
     function Mod(x::Int,N::Int)
         @assert N>1 ""
@@ -104,7 +104,7 @@ This may be abbreviated by `x'`.
 function inv(x::Mod{M}) where M
     (g, v, ignore) = gcdx(x.val, M)
     if g != 1
-        @error "$x is not invertible"
+        error("$x is not invertible")
     end
     return Mod(v, M)
 end
