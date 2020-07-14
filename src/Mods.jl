@@ -162,15 +162,8 @@ isequal(k::Integer, x::Mod) = isequal(x,k)
 # Random
 
 rand(::Type{Mod{N}}) where N = Mod{N}(rand(Int))
-rand(::Type{Mod{N}},n::Int) where N = (Mod{N}).(rand(Int,n))
-rand(::Type{Mod{N}},n::Int, m::Int) where N = (Mod{N}).(rand(Int,n,m))
+rand(::Type{Mod{N}},dims::Integer...) where N = Mod{N}.(rand(Int,dims...))
 
-
-# not sure why this doesn't work
-#
-# function rand(::Type{Mod{N}}, dims::Vararg) where N
-#     (Mod{N}).(rand(Int,dims...))
-# end
 
 
 # Chinese remainder theorem functions

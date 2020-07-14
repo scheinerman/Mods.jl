@@ -238,9 +238,6 @@ Mod{20}(16)
 Random vectors and matrices can be created using `rand(Mod{N})(n)` and
 `rand(Mod{N},n,m)`.
 
-Higher order arrays can be created like this:
-`(Mod{N}).(rand{Int},dims...)`.
-
 
 
 ### Equality and hashing

@@ -51,4 +51,8 @@ M = ones(Mod{11},5,5)
 
 A = rand(Mod{17},5,5)
 X = values.(A)
-@test sum(A) == sum(Mod{17}.(A))
+@test sum(X) == sum(Mod{17}.(A))
+
+v = [Mod{10}(t) for t=1:15]
+S = Set(v)
+@test length(S) == 10
