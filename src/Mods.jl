@@ -2,7 +2,7 @@ module Mods
 
 
 import Base: isequal, (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
-import Base: zero, one, rand
+import Base: zero, one, rand, conj
 
 export Mod, modulus, value
 export isequal, ==, +, -, *, is_invertible, inv, /, ^
@@ -31,6 +31,8 @@ zero(::Type{Mod{N}}) where N = Mod{N}()
 
 one(::Mod{N}) where N = Mod{N}(1)
 one(::Type{Mod{N}}) where N = Mod{N}(1)
+
+conj(x::Mod) = x   # so matrix transpose will work
 
 function hash(x::Mod, h::UInt64= UInt64(0))
     v = BigInt(value(x))
