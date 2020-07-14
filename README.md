@@ -157,22 +157,19 @@ Integer operations on 64-bit numbers can give results requiring more than
 64 bits. Fortunately, when working with modular numbers the results of
 the operations are bounded by the modulus.
 ```
-julia> N = 10^18       # this is a 60-bit number
+julia> N = 10^18                # this is a 60-bit number
 1000000000000000000
-
-julia> N*N             # Here's the problem with integer multiplcation
--5527149226598858752
 
 julia> a = 10^15
 1000000000000000
 
-julia> a*a             # also wrong
+julia> a*a                      # We see that a*a overflows
 5076944270305263616
 
-julia> x = Mod{N}(a)
-Mod{1000000000000000000}(1000000000000000)
+julia> Mod{N}(a*a)              # this gives an incorrect answer
+Mod{1000000000000000000}(76944270305263616)
 
-julia> x*x             # but this is right!
+julia> Mod{N}(a) * Mod{N}(a)    # but this is correct!
 Mod{1000000000000000000}(0)
 ```
 
