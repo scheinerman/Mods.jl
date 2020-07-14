@@ -147,6 +147,9 @@ julia> -x
 Mod{10}(7)
 ```
 
+Note: The rational division operation `//` gives the same result
+as ordinary division `/`.
+
 ### Mixed Integer/Mod arithmetic
 
 The basic four operations may also be performed between a `Mod` object
@@ -196,6 +199,18 @@ ERROR: Mod{100}(5) is not invertible
 julia> Mod{10}(0)^0
 Mod{10}(1)
 ```
+
+
+### Random numbers
+
+The standard `rand` function returns a (pseudo)random `Mod` value. In
+particular, `rand(Mod{N})` returns a value in `{0,1,...,N-1}`,
+each with probability `1/N`.
+````
+julia> rand(Mod{20})
+Mod{20}(16)
+```
+
 
 ### Equality and hashing
 

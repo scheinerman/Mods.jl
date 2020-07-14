@@ -1,8 +1,8 @@
 module Mods
 
 
-import Base: isequal, (==), (+), (-), (*), (inv), (/), (^), hash, show
-import Base: zero, one
+import Base: isequal, (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
+import Base: zero, one, rand
 
 export Mod, modulus, value
 export isequal, ==, +, -, *, is_invertible, inv, /, ^
@@ -127,6 +127,8 @@ function ^(x::Mod{M}, k::Integer) where M
     y = inv(x)
     return y^(-k)
 end
+(//)(x::Mod,y::Mod) = x/y
+
 
 # Operations with Integers
 
@@ -142,12 +144,23 @@ end
 /(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
 /(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
 
+
+(//)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
+(//)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
+
+
 # Comparison with Integers
 
 isequal(x::Mod{M}, k::Integer) where M = mod(k,M) == x.val
 isequal(k::Integer, x::Mod) = isequal(x,k)
 ==(x::Mod, k::Integer) = isequal(x,k)
 ==(k::Integer, x::Mod) = isequal(x,k)
+
+
+# Random
+
+rand(::Type{Mod{N}}) where N = Mod{N}(rand(Int))
+
 
 # Chinese remainder theorem functions
 
