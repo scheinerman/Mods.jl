@@ -150,6 +150,33 @@ Mod{10}(7)
 Note: The rational division operation `//` gives the same result
 as ordinary division `/`.
 
+
+#### Overflow safety
+
+Integer operations on 64-bit numbers can give results requiring more than
+64 bits. Fortunately, when working with modular numbers the results of
+the operations are bounded by the modulus.
+```
+julia> N = 10^18       # this is a 60-bit number
+1000000000000000000
+
+julia> N*N             # Here's the problem with integer multiplcation
+-5527149226598858752
+
+julia> a = 10^15
+1000000000000000
+
+julia> a*a             # also wrong
+5076944270305263616
+
+julia> x = Mod{N}(a)
+Mod{1000000000000000000}(1000000000000000)
+
+julia> x*x             # but this is right!
+Mod{1000000000000000000}(0)
+```
+
+
 ### Mixed Integer/Mod arithmetic
 
 The basic four operations may also be performed between a `Mod` object
@@ -206,10 +233,17 @@ Mod{10}(1)
 The standard `rand` function returns a (pseudo)random `Mod` value. In
 particular, `rand(Mod{N})` returns a value in `{0,1,...,N-1}`,
 each with probability `1/N`.
-````
+```
 julia> rand(Mod{20})
 Mod{20}(16)
 ```
+
+Random vectors and matrices can be created using `rand(Mod{N})(n)` and
+`rand(Mod{N},n,m)`.
+
+Higher order arrays can be created like this:
+`(Mod{N}).(rand{Int},dims...)`.
+
 
 
 ### Equality and hashing

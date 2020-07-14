@@ -23,7 +23,7 @@ x = CRT(a,b)
 @test inv(a)*a == 1
 
 p = 9223372036854775783   # This is a big prime
-x = Mod(-2,p)
+x = Mod{p}(-2)
 @test x*x == 4
 @test x+x == -4
 @test x/x == 1
@@ -47,3 +47,8 @@ M = zeros(Mod{11},3,3)
 
 M = ones(Mod{11},5,5)
 @test sum(M) == 3
+
+
+A = rand(Mod{17},5,5)
+X = values.(A)
+@test sum(A) == sum(Mod{17}.(A))
