@@ -53,8 +53,8 @@ Mod{23}(22)
 julia> Mod{12}(99)
 Mod{12}(3)
 
-julia> x = Mod(4,10)
-Mod(4,10)
+julia> x = Mod(4,10)  # old style works, but please avoid
+Mod{10}(4)
 ```
 
 The smallest allowable modulus is 2:
@@ -129,7 +129,7 @@ use `inv(x)`.
 julia> x = Mod{10}(8); y = Mod{10}(3);
 
 julia> x/y
-Mod(6,10)
+Mod{10}(6)
 
 julia> y/x
 ERROR: Mod{10}(8) is not invertible
@@ -316,7 +316,7 @@ Mod{170}(73)
 ```
 
 We find that `mod(73,10)` equals `3` and `mod(73,17)` equals `5` as
-required. The answer is reported as `Mod(73,170)` because any value of
+required. The answer is reported as `Mod{170}(73)` because any value of
 `x` congruent to 73 modulo 170 is a solution.
 
 The `CRT` function can be applied to any number of arguments so long
