@@ -22,6 +22,12 @@ end
 
 Mod{N}(x::Int=0) where N = Mod(x,N)
 
+function Mod{N}(x::T) where {N,T<:Integer}
+    xx = mod(x,N)
+    return Mod{N}(Int(xx))
+end
+Mod(x::T, N::Int) where T<:Integer = Mod{N}(x)
+
 
 modulus(a::Mod{N}) where N = N
 value(a::Mod{N}) where N = a.val
@@ -134,29 +140,68 @@ end
 
 # Operations with Integers
 
-+(x::Mod{M}, k::Integer) where M = Mod(k,M)+x
-+(k::Integer, x::Mod) = x+k
+(+)(x::Mod{M}, k::Integer) where M = Mod(k,M)+x
+(+)(k::Integer, x::Mod) = x+k
 
--(x::Mod, k::Integer) = x + (-k)
--(k::Integer, x::Mod) = (-x) + k
+(-)(x::Mod, k::Integer) = x + (-k)
+(-)(k::Integer, x::Mod) = (-x) + k
 
-*(x::Mod{M}, k::Integer) where M = Mod(k,M) * x
-*(k::Integer, x::Mod) = x*k
+(*)(x::Mod{M}, k::Integer) where M = Mod(k,M) * x
+(*)(k::Integer, x::Mod) = x*k
 
-/(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
-/(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
+(/)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
+(/)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
 
 
 (//)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
 (//)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
+
+# Operations with rational numbers
+
+Mod{N}(k::Rational) where N = Mod{N}(numerator(k))/Mod{N}(denominator(k))
+
+function +(x::Mod{N}, k::Rational) where N
+    return x + Mod{N}(k)
+end
+(+)(k::Rational,x::Mod) = x+k
+
+(-)(x::Mod,k::Rational) = x + (-k)
+(-)(k::Rational,x::Mod) = k + (-x)
+
+function (*)(x::Mod{N},k::Rational) where N
+    return x * Mod{N}(k)
+end
+(*)(k::Rational,x::Mod) = x*k
+
+function (/)(x::Mod,k::Rational)
+    return x * (1/k)
+end
+(/)(k::Rational,x::Mod) = k * inv(x)
+
+(//)(x::Mod,k::Rational) = x/k
+(//)(k::Rational,x::Mod) = k/x
+
+
+
+
 
 
 # Comparison with Integers
 
 isequal(x::Mod{M}, k::Integer) where M = mod(k,M) == x.val
 isequal(k::Integer, x::Mod) = isequal(x,k)
-==(x::Mod, k::Integer) = isequal(x,k)
-==(k::Integer, x::Mod) = isequal(x,k)
+(==)(x::Mod, k::Integer) = isequal(x,k)
+(==)(k::Integer, x::Mod) = isequal(x,k)
+
+# Comparisons with Rationals
+function isequal(x::Mod{N}, k::Rational) where N
+    return x == Mod{N}(k)
+end
+isequal(k::Rational,x::Mod) = isequal(x,k)
+(==)(x::Mod, k::Rational) = isequal(x,k)
+(==)(k::Rational, x::Mod) = isequal(x,k)
+
+
 
 
 # Random

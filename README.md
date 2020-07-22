@@ -195,6 +195,21 @@ julia> x/7
 Mod{10}(9)
 ```
 
+### Rationals and Mods
+
+The result of `Mod{N}(a//b)` is exactly
+`Mod{N}(numerator(a)) / Mod{n}(denominator(b))`. This may equal
+`Mod{N}(a)/Mod{N}(b)` if `a` and `b` are relatively prime to each other
+and to `N`.
+
+When a `Mod` and a `Rational` are operated with each other, the
+`Rational` is first converted to a `Mod`, and then the operation
+proceeds.
+
+Bad things happen if the denominator and the modulus are not
+relatively prime.
+
+
 
 
 
