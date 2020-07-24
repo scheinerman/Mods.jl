@@ -76,7 +76,7 @@ julia> modulus(x)
 10
 ```
 
-With just no arguments, `Mod{N}` creates a zero element of the given
+With no arguments, `Mod{N}` creates a zero element of the given
 modulus.
 ```
 julia> Mod{17}()
