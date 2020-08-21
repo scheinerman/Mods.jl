@@ -28,8 +28,26 @@ function Mod{N}(x::T) where {N,T<:Integer}
 end
 Mod(x::T, N::Int) where T<:Integer = Mod{N}(x)
 
+"""
+`modulus(a::Mod)` returns the modulus of this `Mod` number.
+```
+julia> a = Mod{13}(11);
 
+julia> modulus(a)
+13
+```
+"""
 modulus(a::Mod{N}) where N = N
+
+"""
+`value(a::Mod)` returns the value of this `Mod` number.
+```
+julia> a = Mod{13}(11);
+
+julia> value(a)
+11
+```
+"""
 value(a::Mod{N}) where N = a.val
 
 zero(::Mod{N}) where N = Mod{N}()

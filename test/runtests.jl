@@ -13,6 +13,10 @@ p = 23
 
 @test Mod{p}(22) == Mod(22,p)
 
+a = Mod{13}(17)
+@test modulus(a)==13
+@test value(a)==4
+
 q = 91
 a = Mod(17,p)
 b = Mod(32,q)
