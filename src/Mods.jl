@@ -137,24 +137,11 @@ function inv(x::Mod{M}) where M
     return Mod(v, M)
 end
 
-# Typing shortcut for inv(x)
-# adjoint(x::Mod)
-
 function /(x::Mod, y::Mod)
     modcheck(x,y)
     return x * inv(y)
 end
 
-function ^(x::Mod{M}, k::Integer) where M
-    if k>0
-        return Mod(powermod(x.val, k, M), M)
-    end
-    if k==0
-        return Mod(1,M)
-    end
-    y = inv(x)
-    return y^(-k)
-end
 (//)(x::Mod,y::Mod) = x/y
 
 
@@ -176,7 +163,7 @@ end
 (//)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
 (//)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
 
-# Operations with rational numbers
+# Operations with rational numbers  [THESE SHOULD PROBABLY BE REMOVED]
 
 Mod{N}(k::Rational) where N = Mod{N}(numerator(k))/Mod{N}(denominator(k))
 

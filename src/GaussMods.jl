@@ -2,11 +2,8 @@ import Base: mod, real, imag, reim, conj, promote_rule
 
 export GaussMod, AbstractMod
 
-function mod(z::Complex{T}, m::Integer) where T<:Integer 
-    a,b = reim(z)
-    return mod(a,m) + mod(b,m)*im 
-end 
-
+# mod support for Gaussian integers until officially adopted into Base
+mod(z::Complex{<:Integer}, n::Integer) = Complex(mod(real(z), n), mod(imag(z), n))
 
 """
 `GaussMod{m}(v)` (and also `GaussMod(v,m)`) creates a modular number in mod `m` with value `v%m`.
