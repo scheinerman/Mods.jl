@@ -81,6 +81,11 @@ show(io::IO, z::GaussMod{N}) where N = print(io,"Mod{$N}($(z.val))")
 
 
 
+# Random
+
+rand(::Type{GaussMod{N}}) where N = GaussMod{N}(rand(Int) + im*rand(Int))
+rand(::Type{GaussMod{N}},dims::Integer...) where N = GaussMod{N}.(rand(Int,dims...)) + im*GaussMod{N}.(rand(Int,dims...))
+
 
 
 
