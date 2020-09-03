@@ -27,11 +27,23 @@ modulus of a `Mod` value `x`. The kludge was to use `x.val` and `x.mod`.
 In this version, the functions `value(x)` and `modulus(x)` are provided.
 [`x.val` still works (although it should be avoided), but `x.mod` does not.]
 
-## Under Construction
+## New Feature in 1.2.0
 
-We are in process with allowing the value of a `Mod` to be a Gaussian integer!
+We allow the value of a `Mod` to be a Gaussian integer!
 Specifically, we define a `GaussMod{N}` type that should be fully interoperable 
-with `Mod{N}`.
+with `Mod{N}`. However, there is no reason for users to explicitly use `GaussMod`; 
+just use `Mod{N}` with a complex argument:
+```julia
+julia> z = Mod{13}(4-3im)
+Mod{13}(4 + 10im)
+
+julia> z^12
+Mod{13}(1 + 0im)
+
+julia> 1/z
+Mod{13}(9 + 10im)
+```
+
 
 ---
 

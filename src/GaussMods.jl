@@ -1,6 +1,6 @@
 import Base: mod, real, imag, reim, conj, promote_rule
 
-export GaussMod
+export GaussMod, AbstractMod
 
 function mod(z::Complex{T}, m::Integer) where T<:Integer 
     a,b = reim(z)
@@ -43,10 +43,24 @@ Mod{N}(x::Complex) where N = GaussMod{N}(x)
 
 # ARITHMETIC
 
-(+)(x::GaussMod{N}, y::GaussMod{N}) where N = GaussMod{N}(x.val+y.val)
+function(+)(x::GaussMod{N}, y::GaussMod{N}) where N
+    xx = widen(x.val)
+    yy = widen(y.val)
+    zz = mod(xx+yy,N)
+    return Mod{N}(zz)
+end
+
 (-)(x::GaussMod{N}) where N = GaussMod{N}(-x.val)
-(-)(x::GaussMod{N},y::GaussMod{N}) where N = GaussMod{N}(x.val - y.val)
-(*)(x::GaussMod{N},y::GaussMod{N}) where N = GaussMod{N}(x.val * y.val)
+(-)(x::GaussMod{N},y::GaussMod{N}) where N = x + (-y)
+
+function (*)(x::GaussMod{N}, y::GaussMod{N}) where N
+    xx = widen(x.val)
+    yy = widen(y.val)
+    zz = mod(xx*yy,N)
+    return Mod{N}(zz)
+end
+
+
 
 function inv(x::GaussMod{N}) where N 
     try
@@ -61,6 +75,9 @@ function inv(x::GaussMod{N}) where N
 end
 (/)(x::GaussMod{N}, y::GaussMod{N}) where N = x * inv(y)
 
+(//)(x::GaussMod{N}, y::GaussMod{N}) where N = x/y
+(//)(x::Number, y::GaussMod{N}) where N = x/y
+(//)(x::GaussMod{N}, y::Number) where N = x/y
 
 
 show(io::IO, z::GaussMod{N}) where N = print(io,"Mod{$N}($(z.val))")

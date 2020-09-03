@@ -43,6 +43,29 @@ y = inv(x)
 @test x+p == x
 @test x*p == 0
 @test p-x == x-2x
+
+p = 9223372036854775783   # This is a large prime
+x = Mod{p}(-2+0im)
+@test x*x == 4
+@test x+x == -4
+@test x/x == 1
+@test x/3 == x/Mod{p}(3)
+@test (x/3) * (3//x) == 1
+@test x//x == value(x)/x
+@test x^4 == 16
+@test x^(p-1) == 1   # Fermat Little Theorem test
+@test 2x == x+x
+@test x-x == 0
+y = inv(x)
+@test x*y == 1
+@test x+p == x
+@test x*p == 0
+@test p-x == x-2x
+
+
+
+
+
 @test 0 <= value(rand(Mod{p})) < p
 
 
