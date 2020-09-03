@@ -4,15 +4,17 @@ module Mods
 import Base: isequal, (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
 import Base: zero, one, rand, conj
 
-export Mod, modulus, value
+export Mod, modulus, value, AbstractMod
 export isequal, ==, +, -, *, is_invertible, inv, /, ^
 export hash, CRT
+
+abstract type AbstractMod <: Number end
 
 """
 `Mod{m}(v)` (and also `Mod(v,m)`) creates a modular number in mod `m` with value `v%m`.
 `Mod{m}()` is equivalent to `Mod(0,m)`.
 """
-struct Mod{N} <: Number
+struct Mod{N} <: AbstractMod
     val::Int
     function Mod(x::Int,N::Int)
         @assert N>1 "modulus must be at least 2"
@@ -48,7 +50,7 @@ julia> value(a)
 11
 ```
 """
-value(a::Mod{N}) where N = a.val
+value(a::AbstractMod) = a.val
 
 zero(::Mod{N}) where N = Mod{N}()
 zero(::Type{Mod{N}}) where N = Mod{N}()
@@ -278,7 +280,7 @@ function CRT(mtuple::Mod...)
     return result
 end
 
+include("GaussMods.jl")
 
-# show(io::IO, m::Mod{N}) where N = print(io,"Mod(",m.val,",",m.mod,")")
 
 end # end of module Mods

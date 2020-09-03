@@ -27,6 +27,12 @@ modulus of a `Mod` value `x`. The kludge was to use `x.val` and `x.mod`.
 In this version, the functions `value(x)` and `modulus(x)` are provided.
 [`x.val` still works (although it should be avoided), but `x.mod` does not.]
 
+## Under Construction
+
+We are in process with allowing the value of a `Mod` to be a Gaussian integer!
+Specifically, we define a `GaussMod{N}` type that should be fully interoperable 
+with `Mod{N}`.
+
 ---
 
 [![Build Status](https://travis-ci.org/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.org/scheinerman/Mods.jl)
