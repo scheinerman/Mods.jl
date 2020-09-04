@@ -163,7 +163,7 @@ end
 (//)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
 (//)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
 
-# Operations with rational numbers  [THESE SHOULD PROBABLY BE REMOVED]
+# Operations with rational numbers  
 
 Mod{N}(k::Rational) where N = Mod{N}(numerator(k))/Mod{N}(denominator(k))
 

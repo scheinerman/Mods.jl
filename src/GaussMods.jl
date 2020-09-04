@@ -22,6 +22,10 @@ GaussMod{N}(x::T) where {N,T<:Integer}  = GaussMod{N}(Complex{Int}(x))
 GaussMod(x::Mod{N}) where N = GaussMod{N}(x.val)
 GaussMod{N}(x::Mod{N}) where N = GaussMod{N}(x.val)
 
+GaussMod{N}(x::Rational{T}) where {N,T<:Integer} = GaussMod{N}(numerator(x)) / GaussMod{N}(denominator(x))
+GaussMod{N}(x::Complex{Rational{T}}) where {N,T<:Integer} = GaussMod{N}(real(x)) + GaussMod{N}(imag(x))*im
+
+
 modulus(x::GaussMod{T}) where T = T
 
 real(x::GaussMod{N}) where N = Mod{N}(real(x.val))
@@ -102,8 +106,12 @@ promote_rule(::Type{Mod{N}}, ::Type{Complex{T}}) where {N, T<:Integer} = GaussMo
 promote_rule(::Complex{Type{T}}, ::Type{Mod{N}}) where {N, T<:Integer} = GaussMod{N}
 
 
+promote_rule(::Type{GaussMod{N}}, ::Type{T}) where {N, T<:Rational} = GaussMod{N}
+promote_rule(::Type{T}, ::Type{GaussMod{N}}) where {N, T<:Rational} = GaussMod{N}
+
+promote_rule(::Type{GaussMod{N}}, ::Type{T}) where {N, T<:Complex} = GaussMod{N}
+promote_rule(::Type{T}, ::Type{GaussMod{N}}) where {N, T<:Complex} = GaussMod{N}
 
 
-
-# promote_rule(::GaussMod{N}, ::Mod{N}) where N = GaussMod{N}
-# promote_rule(::Mod{N}, ::GaussMod{N}) where N = GaussMod{N}
+promote_rule(::Type{Mod{N}}, ::Type{T}) where {N, T<:Complex} = GaussMod{N}
+promote_rule(::Type{T}, ::Type{Mod{N}}) where {N, T<:Complex} = GaussMod{N}

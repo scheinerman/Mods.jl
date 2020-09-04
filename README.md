@@ -42,6 +42,15 @@ Mod{13}(1 + 0im)
 
 julia> 1/z
 Mod{13}(9 + 10im)
+
+julia> a = Mod{13}(1+5*im)
+Mod{13}(1 + 5im)
+
+julia> a*a'
+Mod{13}(0 + 0im)
+
+julia> inv(a)
+ERROR: Mod{13}(1 + 5im) is not invertible
 ```
 
 
