@@ -82,6 +82,9 @@ function inv(x::GaussMod{N}) where N
         error("$x is not invertible")
     end 
 end
+
+is_invertible(x::GaussMod) = is_invertible(real(x*x'))
+
 (/)(x::GaussMod{N}, y::GaussMod{N}) where N = x * inv(y)
 
 (//)(x::GaussMod{N}, y::GaussMod{N}) where N = x/y

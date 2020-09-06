@@ -29,171 +29,187 @@ Mod{17}(1 + 13im)
 
 julia> a'
 Mod{17}(9 + 2im)
+
+julia> typeof(a)
+GaussMod{17}
+
+julia> typeof(b)
+Mod{17}
+
+julia> supertype(ans)
+AbstractMod
 ```
 
+## Basics 
+### `Mod` numbers
 
----
-
-
-
-
-The old version did not have a function to recover the value and the
-modulus of a `Mod` value `x`. The kludge was to use `x.val` and `x.mod`.
-In this version, the functions `value(x)` and `modulus(x)` are provided.
-[`x.val` still works (although it should be avoided), but `x.mod` does not.]
-
-## New Feature in 1.2.0
-
-We allow the value of a `Mod` to be a Gaussian integer!
-Specifically, we define a `GaussMod{N}` type that should be fully interoperable 
-with `Mod{N}`. However, there is no reason for users to explicitly use `GaussMod`; 
-just use `Mod{N}` with a complex argument:
+Integers modulo `N` (where `N>1`) are values in the set 
+`{0,1,2,...,N-1}`. All arithmetic takes place modulu `N`. To create a mod-`N` number 
+we use `Mod{N}(a)`. For example:
 ```julia
-julia> z = Mod{13}(4-3im)
-Mod{13}(4 + 10im)
+julia> Mod{10}(3)
+Mod{10}(3)
 
-julia> z^12
-Mod{13}(1 + 0im)
+julia> Mod{10}(23)
+Mod{10}(3)
 
-julia> 1/z
-Mod{13}(9 + 10im)
+julia> Mod{10}(-3)
+Mod{10}(7)
+```
+The usual arithmetic operations may be used. Furthermore, oridinary integers can be 
+combined with `Mod` values. However, values of different moduli cannot be used
+together in an arithmetic expression. 
+```julia
+julia> a = Mod{10}(5)
+Mod{10}(5)
 
-julia> a = Mod{13}(1+5*im)
-Mod{13}(1 + 5im)
+julia> b = Mod{10}(6)
+Mod{10}(6)
 
-julia> a*a'
-Mod{13}(0 + 0im)
+julia> a+b
+Mod{10}(1)
+
+julia> a-b
+Mod{10}(9)
+
+julia> a*b
+Mod{10}(0)
+
+julia> 2b
+Mod{10}(2)
+```
+Division is permitted, but if the denominator is not invertible, an error is thrown.
+```julia
+julia> a = Mod{10}(5)
+Mod{10}(5)
+
+julia> b = Mod{10}(3)
+Mod{10}(3)
+
+julia> a/b
+Mod{10}(5)
+
+julia> b/a
+ERROR: Mod{10}(5) is not invertible
+```
+Exponentiation by an integer is permitted.
+```julia
+julia> a = Mod{17}(2)
+Mod{17}(2)
+
+julia> a^16
+Mod{17}(1)
+
+julia> a^(-3)
+Mod{17}(15)
+```
+Invertibility can be checked with `is_invertible`.
+```julia
+julia> a = Mod{10}(3)
+Mod{10}(3)
+
+julia> is_invertible(a)
+true
 
 julia> inv(a)
-ERROR: Mod{13}(1 + 5im) is not invertible
-```
+Mod{10}(7)
 
-
----
-
-[![Build Status](https://travis-ci.org/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.org/scheinerman/Mods.jl)
-
-[![codecov.io](http://codecov.io/github/scheinerman/Mods.jl/coverage.svg?branch=master)](http://codecov.io/github/scheinerman/Mods.jl?branch=master)
-
-## Basics
-
-Objects of type `Mod` are a type of `Number`. In particular, `Mod{N}`
-represents values in the set `{0,1,2,...,N-1}` with all operations
-evaluated modulo `N`.
-
-Construct a `Mod` object with `Mod{N}(val)`.  Both `val`
-and `N` must be `Int` values.
-```
-julia> using Mods
-
-julia> Mod{23}(4)
-Mod{23}(4)
-
-julia> Mod{23}(-1)
-Mod{23}(22)
-
-julia> Mod{12}(99)
-Mod{12}(3)
-
-julia> x = Mod(4,10)  # old style works, but please avoid
-Mod{10}(4)
-```
-
-The smallest allowable modulus is 2:
-```
-julia> Mod{-4}(1)
-ERROR: AssertionError: modulus must be at least 2
-```
-
-The functions `modulus` and `value` are used to recover the
-relevant components of a `Mod` number
-```
-julia> x = Mod{10}(14)
+julia> a = Mod{10}(4)
 Mod{10}(4)
 
-julia> value(x)
-4
+julia> is_invertible(a)
+false
 
-julia> modulus(x)
-10
+julia> inv(a)
+ERROR: Mod{10}(4) is not invertible
 ```
 
-With no arguments, `Mod{N}` creates a zero element of the given
-modulus.
-```
-julia> Mod{17}()
-Mod{17}(0)
-```
+Modular number with different moduli cannot be combined using the usual operations.
+```julia
+julia> a = Mod{10}(1)
+Mod{10}(1)
 
-The functions `zero`, `zeros`, `one`, and `ones` behave as for other
-`Number` types:
-```
-julia> one(Mod{19})
-Mod{19}(1)
+julia> b = Mod{9}(1)
+Mod{9}(1)
 
-julia> zeros(Mod{7},3,5)
-3×5 Array{Mod{7},2}:
- Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
- Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
- Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)  Mod{7}(0)
-```
-
-
-## Operations
-
-### The basic four
-
-`Mod` objects can be added, subtracted, mulitplied, and divided with
-one another. The two `Mod` operands must have the same modulus.
-```
-ulia> x = Mod{10}(8); y = Mod{10}(6);
-
-julia> x+y
-Mod{10}(4)
-
-julia> y-x
-Mod{10}(8)
-
-
-julia> x*y
-Mod{10}(8)
-
-julia> Mod{10}(5) + Mod{11}(5)
+julia> a+b
 ERROR: Cannot operate on two Mod objects with different moduli
 ```
 
-Division can result in an error if the divisor is not invertible. A
-`Mod` object `x` can be checked for invertibility using
-`is_invertible(x)`. To find the inverse of `x` (assuming it exists)
-use `inv(x)`.
 
+
+### `GaussMod` numbers
+
+We can also work modulo `N` with Gaussian integers (numbers of the form `a+b*im` where `a`
+and `b` are integers).
+```julia
+julia> a = Mod{10}(2-3im)
+Mod{10}(2 + 7im)
+
+julia> b = Mod{10}(5+6im)
+Mod{10}(5 + 6im)
+
+julia> a+b
+Mod{10}(7 + 3im)
+
+julia> a*b
+Mod{10}(8 + 7im)
 ```
-julia> x = Mod{10}(8); y = Mod{10}(3);
+In addition to the usual arithmetic operations, the following features apply 
+to `GaussMod` values.
 
-julia> x/y
-Mod{10}(6)
+#### Real and imaginary parts
+* Use the functions `real` and `imag` (or `reim`) to extract the real and imaginary parts:
+```julia
+julia> a = Mod{10}(2-3im)
+Mod{10}(2 + 7im)
 
-julia> y/x
-ERROR: Mod{10}(8) is not invertible
+julia> real(a)
+Mod{10}(2)
 
-julia> inv(y)
+julia> imag(a)
 Mod{10}(7)
+
+julia> reim(a)
+(Mod{10}(2), Mod{10}(7))
 ```
 
-We also support unary minus.
+
+
+
+#### Complex conjugate
+Use `a'` (or `conj(a)`) to get the complex conjugate value:
+```julia
+julia> a = Mod{10}(2-3im)
+Mod{10}(2 + 7im)
+
+julia> a'
+Mod{10}(2 + 3im)
+
+julia> a*a'
+Mod{10}(3 + 0im)
+
+julia> a+a'
+Mod{10}(4 + 0im)
 ```
-julia> x = Mod{10}(3)
-Mod{10}(3)
 
-julia> -x
-Mod{10}(7)
+### Inspection
+
+Given a `Mod` or `GaussMod` number, the modulus is recovered using the `modulus`
+function and the numerical value with `value`:
+```julia
+ulia> a = Mod{23}(100)
+Mod{23}(8)
+
+julia> modulus(a)
+23
+
+julia> value(a)
+8
 ```
 
-Note: The rational division operation `//` gives the same result
-as ordinary division `/`.
 
-
-#### Overflow safety
+### Overflow safety
 
 Integer operations on 64-bit numbers can give results requiring more than
 64 bits. Fortunately, when working with modular numbers the results of
@@ -215,149 +231,61 @@ julia> Mod{N}(a) * Mod{N}(a)    # but this is correct!
 Mod{1000000000000000000}(0)
 ```
 
+## Extras
 
-### Mixed Integer/Mod arithmetic
+### Zeros and ones
 
-The basic four operations may also be performed between a `Mod` object
-and an integer. The calculation proceeds as if the integer has the
-same modulus as the `Mod` object.
+The standard Julia functions `zero`, `zeros`, `one`, and `ones` may be used
+with `Mod` and `GaussMod` types:
+```julia
+julia> zero(Mod{9})
+Mod{9}(0)
+
+julia> one(GaussMod{7})
+Mod{7}(1 + 0im)
+
+julia> zeros(Mod{9},2,2)
+2×2 Array{Mod{9},2}:
+ Mod{9}(0)  Mod{9}(0)
+ Mod{9}(0)  Mod{9}(0)
+
+julia> ones(GaussMod{5},4)
+4-element Array{GaussMod{5},1}:
+ Mod{5}(1 + 0im)
+ Mod{5}(1 + 0im)
+ Mod{5}(1 + 0im)
+ Mod{5}(1 + 0im)
+ ```
+
+### Random values
+
+The `rand` function can be used to produce random `Mod` or `GaussMod` values:
 ```
-julia> x = Mod{10}(3);
+julia> rand(Mod{17})
+Mod{17}(13)
 
-julia> x+9
-Mod{10}(2)
-
-julia> 4x
-Mod{10}(2)
-
-julia> 3-x
-Mod{10}(0)
-
-julia> x/7
-Mod{10}(9)
-```
-
-### Rationals and Mods
-
-The result of `Mod{N}(a//b)` is exactly
-`Mod{N}(numerator(a)) / Mod{n}(denominator(b))`. This may equal
-`Mod{N}(a)/Mod{N}(b)` if `a` and `b` are relatively prime to each other
-and to `N`.
-
-When a `Mod` and a `Rational` are operated with each other, the
-`Rational` is first converted to a `Mod`, and then the operation
-proceeds.
-
-Bad things happen if the denominator and the modulus are not
-relatively prime.
-
-
-
-
-
-### Exponentiation
-
-Use `x^k` to raise a `Mod` object `x` to an integer power `k`. If
-`k` is zero, this always returns `Mod{m}(1)` where `m` is the modulus
-of `x`. Negative exponentiation succeeds if and only if `x` is
-invertible.
-```
-julia> x = Mod{100}(3)
-Mod{100}(3)
-
-julia> x^10
-Mod{100}(49)
-
-julia> x^-2
-Mod{100}(89)
-
-julia> x = Mod{100}(5)
-Mod{100}(5)
-
-julia> x^-3
-ERROR: Mod{100}(5) is not invertible
-
-julia> Mod{10}(0)^0
-Mod{10}(1)
+julia> rand(GaussMod{17})
+Mod{17}(3 + 6im)
 ```
 
+With extra arguments, `rand` produces random vectors or matrices populated with 
+modular numbers:
+```julia
+julia> rand(GaussMod{10},4)
+4-element Array{GaussMod{10},1}:
+ Mod{10}(6 + 0im)
+ Mod{10}(3 + 2im)
+ Mod{10}(9 + 9im)
+ Mod{10}(2 + 5im)
 
-### Random numbers
-
-The standard `rand` function returns a (pseudo)random `Mod` value. In
-particular, `rand(Mod{N})` returns a value in `{0,1,...,N-1}`,
-each with probability `1/N`.
-```
-julia> rand(Mod{20})
-Mod{20}(16)
-```
-
-Random vectors and matrices can be created using `rand(Mod{N})(n)` and
-`rand(Mod{N},n,m)`.
-
-
-
-### Equality and hashing
-
-Two `Mod` objects can be compared for equality with either `==` or
-`isequal`.
-```
-julia> Mod{10}(3) == Mod{11}(3)
-false
-
-julia> Mod{10}(3) == Mod{10}(-7)
-true
-```
-
-We can also compare `Mod` objects with integer objects:
-```
-julia> Mod{10}(3) == -7
-true
-
-julia> Mod{10}(3) == 7
-false
-```
+julia> rand(Mod{10},2,5)
+2×5 Array{Mod{10},2}:
+ Mod{10}(3)  Mod{10}(1)  Mod{10}(1)  Mod{10}(3)  Mod{10}(0)
+ Mod{10}(1)  Mod{10}(1)  Mod{10}(8)  Mod{10}(4)  Mod{10}(0)
+ ```
 
 
-We also define `hash` for `Mod` objects so they can be stored in sets
-and used as keys in a dictionary.
-```
-julia> A = Set{Mod}()
-Set{Mod} with 0 elements
-
-julia> push!(A,Mod{10}(3))
-Set{Mod} with 1 element:
-  Mod{10}(3)
-
-julia> push!(A,Mod{11}(3))
-Set{Mod} with 2 elements:
-  Mod{10}(3)
-  Mod{11}(3)
-```
-
-The container can be narrowed to a particular `Mod` and then
-we have this:
-```
-julia> B = Set{Mod{10}}()
-Set{Mod{10}} with 0 elements
-
-julia> push!(B,0)
-Set{Mod{10}} with 1 element:
-  Mod{10}(0)
-
-julia> push!(B,11)
-Set{Mod{10}} with 2 elements:
-  Mod{10}(0)
-  Mod{10}(1)
-
-julia> push!(B,Mod{11}(3))
-ERROR: MethodError: no method matching Mod{10}(::Mod{11})
-```
-The last input fails because `B` was defined to be a `Set`
-that holds `Mod{10}` objects only.
-
-
-### Chinese Remainder Theorem calculations
+### Chinese remainder theorem
 
 The Chinese Remainder Theorem gives a solution to the following
 problem. Given integers `a, b, m, n` with `gcd(m,n)==1` find an
@@ -378,3 +306,25 @@ required. The answer is reported as `Mod{170}(73)` because any value of
 
 The `CRT` function can be applied to any number of arguments so long
 as their moduli are pairwise relatively prime.
+
+
+
+
+
+
+### Rationals and Mods
+
+The result of `Mod{N}(a//b)` is exactly
+`Mod{N}(numerator(a)) / Mod{n}(denominator(b))`. This may equal
+`Mod{N}(a)/Mod{N}(b)` if `a` and `b` are relatively prime to each other
+and to `N`.
+
+When a `Mod` and a `Rational` are operated with each other, the
+`Rational` is first converted to a `Mod`, and then the operation
+proceeds.
+
+Bad things happen if the denominator and the modulus are not
+relatively prime.
+
+
+
