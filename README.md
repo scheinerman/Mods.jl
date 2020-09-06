@@ -3,12 +3,17 @@
 Modular arithmetic for Julia.
 
 
+[![Build Status](https://travis-ci.org/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.org/scheinerman/Mods.jl)
+
+
+
+
 ## Quick Overview
 This module supports modular values and arithmetic. The moduli are integers (at least 2)
 and the values are either integers or Gaussian integers.
 
-An element of $\mathbb{Z}_N$ is entered as `Mod{N}(a)` and is of type `Mod{N}`
-element of $\mathbb{Z}_N[i]$ is entered a `Mod{N}(a+b*im)` and is of type 
+An element of $\mathbb{Z}_N$ is entered as `Mod{N}(a)` and is of type `Mod{N}`.
+An element of $\mathbb{Z}_N[i]$ is entered a `Mod{N}(a+b*im)` and is of type 
 `GaussMod{N}`. Both types are fully interoperable with each other and with 
 (ordinary) integers and Gaussian integers.
 
