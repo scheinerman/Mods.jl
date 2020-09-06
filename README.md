@@ -331,5 +331,36 @@ proceeds.
 Bad things happen if the denominator and the modulus are not
 relatively prime.
 
+## Other Packages Using `Mod`s
+
+The `Mod` and `GaussMod` types work well with my
+[SimplePolynomials](https://github.com/scheinerman/SimplePolynomials.jl) and [LinearAlgebraX](https://github.com/scheinerman/LinearAlgebraX.jl) modules.
 
 
+```julia
+julia> using LinearAlgebraX
+
+julia> A = rand(GaussMod{13},3,3)
+3×3 Array{GaussMod{13},2}:
+ Mod{13}(11 + 0im)   Mod{13}(0 + 10im)  Mod{13}(1 + 9im)
+  Mod{13}(8 + 4im)  Mod{13}(11 + 10im)  Mod{13}(1 + 8im)
+ Mod{13}(11 + 6im)   Mod{13}(10 + 6im)  Mod{13}(7 + 3im)
+
+julia> detx(A)
+Mod{13}(2 + 11im)
+
+julia> invx(A)
+3×3 Array{GaussMod{13},2}:
+  Mod{13}(4 + 6im)   Mod{13}(3 + 3im)    Mod{13}(5 + 1im)
+  Mod{13}(5 + 0im)  Mod{13}(9 + 12im)   Mod{13}(3 + 10im)
+ Mod{13}(11 + 6im)   Mod{13}(5 + 1im)  Mod{13}(10 + 12im)
+
+julia> ans * A
+3×3 Array{GaussMod{13},2}:
+ Mod{13}(1 + 0im)  Mod{13}(0 + 0im)  Mod{13}(0 + 0im)
+ Mod{13}(0 + 0im)  Mod{13}(1 + 0im)  Mod{13}(0 + 0im)
+ Mod{13}(0 + 0im)  Mod{13}(0 + 0im)  Mod{13}(1 + 0im)
+
+julia> char_poly(A)
+Mod{13}(11 + 2im) + Mod{13}(2 + 1im)*x + Mod{13}(10 + 0im)*x^2 + Mod{13}(1 + 0im)*x^3
+```
