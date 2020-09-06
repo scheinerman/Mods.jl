@@ -80,6 +80,11 @@ M = ones(Mod{11},5,5)
 @test Mod{11}(5) * 4//6 == (2*Mod{11}(5))/3
 @test Mod{11}(2//3) == Mod{11}(4)/Mod{11}(6)
 
+x = Mod{17}(11)
+y = x+0im
+@test x==y
+@test hash(x) == hash(y)
+
 
 
 A = rand(Mod{17},5,5)
@@ -87,5 +92,9 @@ X = values.(A)
 @test sum(X) == sum(Mod{17}.(A))
 
 v = [Mod{10}(t) for t=1:15]
+w = [Mod{10}(t+0im) for t=1:15]
 S = Set(v)
+T = Set(w)
 @test length(S) == 10
+@test S==T
+@test union(S,T) == intersect(S,T)

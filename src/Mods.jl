@@ -60,9 +60,9 @@ one(::Type{Mod{N}}) where N = Mod{N}(1)
 
 conj(x::Mod) = x   # so matrix transpose will work
 
-function hash(x::Mod, h::UInt64= UInt64(0))
-    v = BigInt(value(x))
-    m = BigInt(modulus(x))
+function hash(x::AbstractMod, h::UInt64= UInt64(0))
+    v = value(x)
+    m = modulus(x)
     return hash(v,hash(m,h))
 end
 

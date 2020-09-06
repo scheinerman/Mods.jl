@@ -2,25 +2,40 @@
 
 Modular arithmetic for Julia.
 
+
+## Quick Overview
+This module supports modular values and arithmetic. The moduli are integers (at least 2)
+and the values are either integers or Gaussian integers.
+
+An element of $\mathbb{Z}_N$ is entered as `Mod{N}(a)` and is of type `Mod{N}`
+element of $\mathbb{Z}_N[i]$ is entered a `Mod{N}(a+b*im)` and is of type 
+`GaussMod{N}`. Both types are fully interoperable with each other and with 
+(ordinary) integers and Gaussian integers.
+
+```julia
+julia> a = Mod{17}(9); b = Mod{17}(10);
+
+julia> a+b
+Mod{17}(2)
+
+julia> 2a
+Mod{17}(1)
+
+julia> a = Mod{17}(9-2im)
+Mod{17}(9 + 15im)
+
+julia> 2a
+Mod{17}(1 + 13im)
+
+julia> a'
+Mod{17}(9 + 2im)
+```
+
+
 ---
-## **ALERT**: This is a new version
 
-### Release notes
 
-This is a new version of the `Mods` module. Old code might not function.
-The old constructor `Mod(a,m)` has been replaced by `Mod{m}(a)` (although the
-old version still works). The advantage is that now `Mod{n}` is a type and
-so can be used in broadcasting:
-```
-julia> Mod{5}.(1:6)
-6-element Array{Mod{5},1}:
- Mod{5}(1)
- Mod{5}(2)
- Mod{5}(3)
- Mod{5}(4)
- Mod{5}(0)
- Mod{5}(1)
-```
+
 
 The old version did not have a function to recover the value and the
 modulus of a `Mod` value `x`. The kludge was to use `x.val` and `x.mod`.

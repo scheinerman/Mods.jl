@@ -40,6 +40,14 @@ conj(x::GaussMod{N}) where N = GaussMod{N}(conj(x.val))
 
 Mod{N}(x::Complex) where N = GaussMod{N}(x)
 
+function Mod{N}(x::GaussMod{N}) where N
+    if imag(x) == 0
+        return Mod{N}(real(x))
+    end 
+    error("Cannot convert $x to type Mod{$N} (nonzero imaginary part)\nPerhaps use: real(x)")
+end
+
+Mod(x::GaussMod{N}) where N = Mod{N}(x)
 
 
 # ARITHMETIC
