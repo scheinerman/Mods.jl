@@ -1,100 +1,156 @@
 using Test
 using Mods
 
-p = 23
-@test Mod(2,p) == Mod(25,p)
-@test Mod(2,p)+Mod(21,p) == Mod(0,p)
-@test Mod(10,p)*Mod(5,p) == Mod(4,p)
-@test Mod(10,p)/Mod(5,p) == Mod(2,p)
-@test Mod(17,p) * inv(Mod(17,p)) == Mod(1,p)
-@test Mod(17^6,p)==Mod(17,p)^6
-@test Mod(17,p)^(-2) == inv(Mod(17,p))^2
-@test Mod(17,p) == 17
 
-@test Mod{p}(22) == Mod(22,p)
+@testset "Mod arithmetic" begin
+    p = 23
+    a = Mod{p}(2)
+    b = Mod{p}(25)
+    @test a == b
+    @test a == 2
+    @test a == -21
 
-a = Mod{13}(17)
-@test modulus(a)==13
-@test value(a)==4
+    b = Mod{p}(20)
+    @test a + b == 22
+    @test a - b == -18
+    @test a + a == 2a
+    @test 0 - a == -a
 
-q = 91
-a = Mod(17,p)
-b = Mod(32,q)
+    @test a * b == Mod{p}(17)
+    @test (a / b) * b == a
+    @test (b // a) * (2 // 1) == b
+    @test a * (2 // 3) == (2a) * inv(Mod{p}(3))
 
-x = CRT(a,b)
-@test Mod(x.val,p)==a
-@test Mod(x.val,q)==b
-@test inv(a)*a == 1
+    @test is_invertible(a)
+    @test !is_invertible(Mod{10}(4))
 
-p = 9223372036854775783   # This is a large prime
-x = Mod{p}(-2)
-@test x*x == 4
-@test x+x == -4
-@test x/x == 1
-@test x/3 == x/Mod{p}(3)
-@test (x/3) * (3//x) == 1
-@test x//x == value(x)/x
-@test x^4 == 16
-@test x^(p-1) == 1   # Fermat Little Theorem test
-@test 2x == x+x
-@test x-x == 0
-y = inv(x)
-@test x*y == 1
-@test x+p == x
-@test x*p == 0
-@test p-x == x-2x
+    @test a^(p - 1) == 1
+    @test a^(-1) == inv(a)
+end
 
-p = 9223372036854775783   # This is a large prime
-x = Mod{p}(-2+0im)
-@test x*x == 4
-@test x+x == -4
-@test x/x == 1
-@test x/3 == x/Mod{p}(3)
-@test (x/3) * (3//x) == 1
-@test x//x == value(x)/x
-@test x^4 == 16
-@test x^(p-1) == 1   # Fermat Little Theorem test
-@test 2x == x+x
-@test x-x == 0
-y = inv(x)
-@test x*y == 1
-@test x+p == x
-@test x*p == 0
-@test p-x == x-2x
+@testset "GaussMod arithmetic" begin
+    p = 23
+    a = GaussMod{p}(3 - im)
+    b = GaussMod{p}(5 + 5im)
+
+    @test a + b == 8 + 4im
+    @test a + Mod{p}(11) == Mod{p}(14, 22)
+    @test -a == 20 + im
+    @test a - b == Mod{p}(3 - im - 5 - 5im)
+
+    @test a * b == Mod{p}((3 - im) * (5 + 5im))
+    @test a / b == Mod{p}((3 - im) // (5 + 5im))
+
+    @test a^(p * p - 1) == 1
+    @test is_invertible(a)
+    @test a * inv(a) == 1
+
+    @test a / (1 + im) == a / GaussMod{p}(1 + im)
+    @test imag(a * a') == 0
 
 
 
 
 
-@test 0 <= value(rand(Mod{p})) < p
+
+end
+
+@testset "Large Modulus" begin
+
+    p = 9223372036854775783   # This is a large prime
+    x = Mod{p}(-2)
+    @test x * x == 4
+    @test x + x == -4
+    @test x / x == 1
+    @test x / 3 == x / Mod{p}(3)
+    @test (x / 3) * (3 // x) == 1
+    @test x // x == value(x) / x
+    @test x^4 == 16
+    @test x^(p - 1) == 1   # Fermat Little Theorem test
+    @test 2x == x + x
+    @test x - x == 0
+    y = inv(x)
+    @test x * y == 1
+    @test x + p == x
+    @test x * p == 0
+    @test p - x == x - 2x
+
+    p = 9223372036854775783   # This is a large prime
+    x = Mod{p}(-2 + 0im)
+    @test x * x == 4
+    @test x + x == -4
+    @test x / x == 1
+    @test x / 3 == x / Mod{p}(3)
+    @test (x / 3) * (3 // x) == 1
+    @test x // x == value(x) / x
+    @test x^4 == 16
+    @test x^(p - 1) == 1   # Fermat Little Theorem test
+    @test 2x == x + x
+    @test x - x == 0
+    y = inv(x)
+    @test x * y == 1
+    @test x + p == x
+    @test x * p == 0
+    @test p - x == x - 2x
+
+    @test 0 <= value(rand(Mod{p})) < p
+
+end
 
 
-M = zeros(Mod{11},3,3)
-@test sum(M) == 0
 
-M = ones(Mod{11},5,5)
-@test sum(M) == 3
+@testset "CRT" begin
+    p = 23
+    q = 91
+    a = Mod{p}(17)
+    b = Mod{q}(32)
 
-@test Mod{11}(5) + 4//6 == Mod{11}(5) + Mod{11}(2)/Mod{11}(3)
-@test Mod{11}(5) * 4//6 == Mod{11}(5) * Mod{11}(2)/Mod{11}(3)
-@test Mod{11}(5) * 4//6 == (2*Mod{11}(5))/3
-@test Mod{11}(2//3) == Mod{11}(4)/Mod{11}(6)
+    x = CRT(a, b)
+    @test a == mod(value(x), p)
+    @test b == mod(value(x), q)
 
-x = Mod{17}(11)
-y = x+0im
-@test x==y
-@test hash(x) == hash(y)
+    c = Mod{101}(86)
+    x = CRT(a,b,c)
+
+    @test a == mod(value(x), p)
+    @test b == mod(value(x), q)
+    @test c == mod(value(x), 101)
+
+end
 
 
+@testset "Matrices" begin
+    M = zeros(Mod{11}, 3, 3)
+    @test sum(M) == 0
 
-A = rand(Mod{17},5,5)
-X = values.(A)
-@test sum(X) == sum(Mod{17}.(A))
+    M = ones(Mod{11}, 5, 5)
+    @test sum(M) == 3
 
-v = [Mod{10}(t) for t=1:15]
-w = [Mod{10}(t+0im) for t=1:15]
-S = Set(v)
-T = Set(w)
-@test length(S) == 10
-@test S==T
-@test union(S,T) == intersect(S,T)
+    M = rand(GaussMod{11}, 5, 6)
+    @test size(M) == (5, 6)
+
+    A = rand(Mod{17}, 5, 5)
+    X = values.(A)
+    @test sum(X) == sum(Mod{17}.(A))
+end
+
+@testset "Hashing/Iterating" begin
+    x = Mod{17}(11)
+    y = x + 0im
+    @test x == y
+    @test hash(x) == hash(y)
+    @test typeof(x) !== typeof(y)
+
+    A = Set([x,y])
+    @test length(A) == 1
+
+    v = [Mod{10}(t) for t = 1:15]
+    w = [Mod{10}(t + 0im) for t = 1:15]
+    S = Set(v)
+    T = Set(w)
+    @test length(S) == 10
+    @test S == T
+    @test union(S, T) == intersect(S, T)
+end
+
+

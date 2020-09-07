@@ -1,6 +1,5 @@
 module Mods
 
-
 import Base: isequal, (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
 import Base: zero, one, rand, conj
 
@@ -11,8 +10,8 @@ export hash, CRT
 abstract type AbstractMod <: Number end
 
 """
-`Mod{m}(v)` (and also `Mod(v,m)`) creates a modular number in mod `m` with value `v%m`.
-`Mod{m}()` is equivalent to `Mod(0,m)`.
+`Mod{m}(v)` creates a modular number in mod `m` with value `mod(v,m)`.
+`Mod{m}()` is equivalent to `Mod{m}(0)`.
 """
 struct Mod{N} <: AbstractMod
     val::Int

@@ -6,8 +6,8 @@ export GaussMod, AbstractMod
 mod(z::Complex{<:Integer}, n::Integer) = Complex(mod(real(z), n), mod(imag(z), n))
 
 """
-`GaussMod{m}(v)` (and also `GaussMod(v,m)`) creates a modular number in mod `m` with value `v%m`.
-`GaussMod{m}()` is equivalent to `GaussMod(0,m)`.
+`GaussMod{m}(v)` creates a modular number in mod `m` with value `mod(v,m)`.
+`GaussMod{m}()` is equivalent to `GaussMod{m}(0)`.
 """
 struct GaussMod{N} <: AbstractMod
     val::Complex{Int}
@@ -25,6 +25,7 @@ GaussMod{N}(x::Mod{N}) where N = GaussMod{N}(x.val)
 GaussMod{N}(x::Rational{T}) where {N,T<:Integer} = GaussMod{N}(numerator(x)) / GaussMod{N}(denominator(x))
 GaussMod{N}(x::Complex{Rational{T}}) where {N,T<:Integer} = GaussMod{N}(real(x)) + GaussMod{N}(imag(x))*im
 
+Mod{N}(a::S,b::T) where {N,S<:Integer,T<:Integer} = GaussMod{N}(a+b*im)
 
 modulus(x::GaussMod{T}) where T = T
 
