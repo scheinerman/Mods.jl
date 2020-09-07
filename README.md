@@ -49,7 +49,7 @@ AbstractMod
 ### `Mod` numbers
 
 Integers modulo `N` (where `N>1`) are values in the set 
-`{0,1,2,...,N-1}`. All arithmetic takes place modulu `N`. To create a mod-`N` number 
+`{0,1,2,...,N-1}`. All arithmetic takes place modulo `N`. To create a mod-`N` number 
 we use `Mod{N}(a)`. For example:
 ```julia
 julia> Mod{10}(3)
