@@ -1,6 +1,18 @@
 using Test
 using Mods
 
+@testset "Constructors" begin 
+    @test Mod{17}() == 0
+    @test Mod{17}(1) == GaussMod{17}(1,0)
+    @test Mod{17}(1,2) == 1 + 2im
+    a = Mod{17}(3)
+    @test typeof(a) == Mod{17}
+    a = Mod{17}(3,2)
+    @test typeof(a) == GaussMod{17}
+    a = GaussMod{17}()
+    @test typeof(a) == GaussMod{17}
+end 
+
 
 @testset "Mod arithmetic" begin
     p = 23

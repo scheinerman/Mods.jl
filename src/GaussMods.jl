@@ -19,6 +19,7 @@ end
 
 GaussMod{N}(x::Complex{T}=0+0im) where {N,T<:Integer} = GaussMod(x,N)
 GaussMod{N}(x::T) where {N,T<:Integer}  = GaussMod{N}(Complex{Int}(x))
+GaussMod{N}(x::S,y::T) where {N,S<:Integer,T<:Integer} = GaussMod{N}(x + y*im)
 GaussMod(x::Mod{N}) where N = GaussMod{N}(x.val)
 GaussMod{N}(x::Mod{N}) where N = GaussMod{N}(x.val)
 
