@@ -219,7 +219,7 @@ julia> value(a)
 Integer operations on 64-bit numbers can give results requiring more than
 64 bits. Fortunately, when working with modular numbers the results of
 the operations are bounded by the modulus.
-```
+```julia
 julia> N = 10^18                # this is a 60-bit number
 1000000000000000000
 
@@ -265,7 +265,7 @@ julia> ones(GaussMod{5},4)
 ### Random values
 
 The `rand` function can be used to produce random `Mod` or `GaussMod` values:
-```
+```julia
 julia> rand(Mod{17})
 Mod{17}(13)
 
@@ -298,7 +298,7 @@ integer `x` such that `mod(x,m)==mod(a,m)` and
 `mod(x,n)==mod(b,n)`. We provide the `CRT` function to solve this
 problem as illustrated here with `a=3`, `m=10`, `b=5`, and `n=17`:
 
-```
+```julia
 julia> s = Mod{10}(3); t = Mod{17}(5);
 
 julia> CRT(s,t)
