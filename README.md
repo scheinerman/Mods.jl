@@ -3,7 +3,7 @@
 Modular arithmetic for Julia.
 
 
-[![Build Status](https://travis-ci.org/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.org/scheinerman/Mods.jl)
+[![Build Status](https://travis-ci.com/scheinerman/Mods.jl.svg?branch=master)](https://travis-ci.com/scheinerman/Mods.jl)
 
 
 
