@@ -23,6 +23,6 @@ deploydocs(
     repo = "github.com/scheinerman/Mods.jl.git",
     target = "build",
     push_preview = true,
-    devbranch = "main",
+    devbranch = "master",
     forcepush = true,
 )
