@@ -11,23 +11,23 @@ abstract type AbstractMod <: Number end
 
 """
 `Mod{m}(v)` creates a modular number in mod `m` with value `mod(v,m)`.
-`Mod{m}()` is equivalent to `Mod{m}(0)`.
 """
-struct Mod{N} <: AbstractMod
-    val::Int
-    function Mod(x::Int,N::Int)
-        @assert N>1 "modulus must be at least 2"
-        new{N::Int}(mod(x,N))
-    end
+struct Mod{N,T<:Integer} <: AbstractMod
+    val::T
 end
 
-Mod{N}(x::Int=0) where N = Mod(x,N)
-
-function Mod{N}(x::T) where {N,T<:Integer}
-    xx = mod(x,N)
-    return Mod{N}(Int(xx))
+# safe constructors (slower)
+function Mod{N}(x::T) where {T<:Integer,N}
+    @assert N>1 "modulus must be at least 2"
+    Mod{N,T}(x)
 end
-Mod(x::T, N::Int) where T<:Integer = Mod{N}(x)
+function Mod(x::Integer, N::Integer)
+    Mod{N}(mod(x,N))
+end
+
+# type casting
+Mod{N,T}(x::Mod{N,T2}) where {T,N,T2} = Mod{N,T}(T(x.val))
+Mod{N,T}(x::Mod{N,T}) where {T<:Integer,N} = x
 
 """
 `modulus(a::Mod)` returns the modulus of this `Mod` number.
@@ -49,13 +49,13 @@ julia> value(a)
 11
 ```
 """
-value(a::AbstractMod) = a.val
+value(a::Mod) = a.val
 
-zero(::Mod{N}) where N = Mod{N}()
-zero(::Type{Mod{N}}) where N = Mod{N}()
+zero(::Mod{N,T}) where {N,T} = Mod{N,T}(zero(T))
+zero(::Type{Mod{N,T}}) where {N,T} = Mod{N,T}(zero(T))
 
-one(::Mod{N}) where N = Mod{N}(1)
-one(::Type{Mod{N}}) where N = Mod{N}(1)
+one(::Mod{N,T}) where {N,T} = Mod{N,T}(one(T))
+one(::Type{Mod{N,T}}) where {N,T} = Mod{N,T}(one(T))
 
 conj(x::Mod) = x   # so matrix transpose will work
 
@@ -66,34 +66,20 @@ function hash(x::AbstractMod, h::UInt64= UInt64(0))
 end
 
 # Test for equality
-isequal(x::Mod, y::Mod) = value(x)==value(y) && modulus(x)==modulus(y)
+isequal(x::Mod{N,T1}, y::Mod{M,T2}) where {M,N,T1,T2} = false
+isequal(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = value(x)==value(y)
 
 ==(x::Mod,y::Mod) = isequal(x,y)
 
 
-"""
-`modcheck(x::Mod,y::Mod)` checks if `x` and `y` have the same modulus.
-If so, return than modulus. If not, throw an error.
-"""
-function modcheck(x::Mod, y::Mod)::Int
-    mx = modulus(x)
-    my = modulus(y)
-    if mx != my
-        error("Cannot operate on two Mod objects with different moduli")
-    end
-    return mx
-end
-
 # Easy arithmetic
-function +(x::Mod, y::Mod)::Mod
-    m = modcheck(x,y)
-    s,flag = Base.add_with_overflow(x.val,y.val)
+@inline function +(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
+    s, flag = Base.add_with_overflow(x.val,y.val)
     if !flag
-        return Mod(x.val+y.val, m)
+        return Mod{N,T}(s)
     end
-    s = widen(x.val) + widen(y.val)    # add with added precision
-    s = Int(mod(s,m))                  # reduce by modulus
-    return Mod(s,m)
+    t = widen(x.val) + widen(y.val)    # add with added precision
+    return Mod{N,T}(unsafe_mod(t,N))
 end
 
 
@@ -103,16 +89,16 @@ end
 
 -(x::Mod,y::Mod) = x + (-y)
 
+unsafe_mod(x, y) = x - (x ÷ y) * y
 
-function *(x::Mod, y::Mod)
-    m = modcheck(x,y)
-    p,flag = Base.mul_with_overflow(x.val,y.val)
+@inline function *(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
+    p, flag = Base.mul_with_overflow(x.val,y.val)
     if !flag
-        return Mod(x.val*y.val, m)
+        return Mod{N,T}(p)
+    else
+        q = widemul(x.val, y.val)         # multipy with added precision
+        return Mod{N,T}(unsafe_mod(q,N)) # return with proper type
     end
-    p = widemul(x.val, y.val)         # multipy with added precision
-    p = Int(mod(p,m))                  # reduce by the modulus
-    return Mod(p,m) # return with proper type
 end
 
 # Division stuff
@@ -136,8 +122,7 @@ function inv(x::Mod{M}) where M
     return Mod(v, M)
 end
 
-function /(x::Mod, y::Mod)
-    modcheck(x,y)
+function /(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
     return x * inv(y)
 end
 
