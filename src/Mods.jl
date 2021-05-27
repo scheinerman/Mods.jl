@@ -117,11 +117,14 @@ end
 This may be abbreviated by `x'`.
 """
 @inline function inv(x::Mod{M,T}) where {M,T}
-    (g, v, ignore) = gcdx(x.val, M)
+    Mod{M,T}(_invmod(x.val, M))
+end
+@inline function _invmod(x, m)
+    (g, v, _) = gcdx(x, m)
     if g != 1
-        error("$x is not invertible")
+        error("$x (mod $m) is not invertible")
     end
-    return Mod{M,T}(v)
+    return v
 end
 
 function /(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
@@ -167,56 +170,38 @@ rand(::Type{Mod{N}}, args::Integer...) where {N} = rand(Mod{N,Int}, args...)
 rand(::Type{Mod{N,T}}) where {N,T} = Mod{N}(rand(T))
 rand(::Type{Mod{N,T}},dims::Integer...) where {N,T} = Mod{N}.(rand(T,dims...))
 
-
-
 # Chinese remainder theorem functions
-
-# private helper function
-function CRT_work(x::Mod{n}, y::Mod{m}) where {n,m}
-    if gcd(n,m) != 1
-        error("Moduli must be pairwise relatively prime")
-    end
-
-    a = x.val
-    b = y.val
-
-    k = inv(Mod{m}(n)) * (b-a)
-
-    z = a + k.val*n
-
-    return Mod{n*m}(z)
-end
-
-# public interface
 """
-`CRT(m1,m2,...)`: Chinese Remainder Theorem
+`CRT(m1, m2,...)`: Chinese Remainder Theorem
+
 ```
-julia> CRT( Mod(4,11), Mod(8,14) )
-Mods.Mod(92,154)
+julia> CRT(Mod{11}(4), Mod{14}(814))
+92
 
 julia> 92%11
 4
 
 julia> 92%14
 8
+
+julia> CRT(BigInt, Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642))
 ```
 """
-function CRT(mtuple::Mod...)
-    n = length(mtuple)
-    if n == 0
-        return 1
-    end
-
-    result::Mod = mtuple[1]
-
-    for k=2:n
-        result = CRT_work(result,mtuple[k])
-    end
-
-    return result
+function CRT(remainders, primes)
+    length(remainders) == length(primes) || error("size mismatch")
+    isempty(remainders) && return 1
+    M = prod(primes)
+    Ms = M .÷ primes
+    ti = _invmod.(Ms, primes)
+    mod(sum(remainders .* ti .* Ms), M)
 end
 
-include("GaussMods.jl")
+function CRT(::Type{T}, rs::Mod...) where T
+    isempty(rs) && return 1
+    CRT(convert.(T, value.(rs)), convert.(T, modulus.(rs)))
+end
+CRT(rs::Mod{<:Any, T}...) where T = CRT(T, rs...)
 
+include("GaussMods.jl")
 
 end # end of module Mods

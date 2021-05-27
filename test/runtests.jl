@@ -112,16 +112,17 @@ end
     b = Mod{q}(32)
 
     x = CRT(a, b)
-    @test a == mod(value(x), p)
-    @test b == mod(value(x), q)
+    @test a == mod(x, p)
+    @test b == mod(x, q)
 
     c = Mod{101}(86)
     x = CRT(a,b,c)
 
-    @test a == mod(value(x), p)
-    @test b == mod(value(x), q)
-    @test c == mod(value(x), 101)
+    @test a == mod(x, p)
+    @test b == mod(x, q)
+    @test c == mod(x, 101)
 
+    @test  CRT(BigInt, Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642)) == 85070591730234614113402964855534653468
 end
 
 
