@@ -82,7 +82,7 @@ end
     @test p - x == x - 2x
 
     p = 9223372036854775783   # This is a large prime
-    x = Mod{p}(-2 + 0im)
+    x = GaussMod{p}(-2 + 0im)
     @test x * x == 4
     @test x + x == -4
     @test x / x == 1
@@ -151,7 +151,7 @@ end
     @test length(A) == 1
 
     v = [Mod{10}(t) for t = 1:15]
-    w = [Mod{10}(t + 0im) for t = 1:15]
+    w = [GaussMod{10}(t + 0im) for t = 1:15]
     S = Set(v)
     T = Set(w)
     @test length(S) == 10

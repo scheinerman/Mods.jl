@@ -129,6 +129,8 @@ function /(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
 end
 
 (//)(x::Mod,y::Mod) = x/y
+(//)(x::Number, y::Mod{N}) where N = x/y
+(//)(x::Mod{N}, y::Number) where N = x/y
 
 #Base.convert(::Type{Mod{M,T}}, x::Integer) where {M,T} = Mod{M,T}(x)
 Base.promote_rule(::Type{Mod{M,T1}}, ::Type{T2}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
@@ -161,8 +163,9 @@ isequal(k::Rational,x::Mod) = isequal(x,k)
 
 # Random
 
-rand(::Type{Mod{N}}) where N = Mod{N}(rand(Int))
-rand(::Type{Mod{N}},dims::Integer...) where N = Mod{N}.(rand(Int,dims...))
+rand(::Type{Mod{N}}, args::Integer...) where {N} = rand(Mod{N,Int}, args...)
+rand(::Type{Mod{N,T}}) where {N,T} = Mod{N}(rand(T))
+rand(::Type{Mod{N,T}},dims::Integer...) where {N,T} = Mod{N}.(rand(T,dims...))
 
 
 
@@ -170,8 +173,6 @@ rand(::Type{Mod{N}},dims::Integer...) where N = Mod{N}.(rand(Int,dims...))
 
 # private helper function
 function CRT_work(x::Mod{n}, y::Mod{m}) where {n,m}
-    # n = x.mod
-    # m = y.mod
     if gcd(n,m) != 1
         error("Moduli must be pairwise relatively prime")
     end
@@ -179,11 +180,11 @@ function CRT_work(x::Mod{n}, y::Mod{m}) where {n,m}
     a = x.val
     b = y.val
 
-    k = inv(Mod(n,m)) * (b-a)
+    k = inv(Mod{m}(n)) * (b-a)
 
     z = a + k.val*n
 
-    return Mod(z, n*m)
+    return Mod{n*m}(z)
 end
 
 # public interface

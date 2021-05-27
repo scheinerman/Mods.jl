@@ -46,7 +46,7 @@ reim(x::AbstractMod) = (real(x),imag(x))
 
 conj(x::GaussMod{N}) where N = GaussMod{N}(conj(x.val))
 
-function Mod{N,T}(x::GaussMod{N,T}) where {N,T}
+function Mod{N,T}(x::GaussMod{N,T2}) where {N,T<:Integer, T2<:Integer}
     if imag(x) == 0
         return Mod{N,T}(real(x))
     end 
@@ -93,16 +93,17 @@ isequal(x::GaussMod{N},y::GaussMod{N}) where N = value(x) == value(y)
 
 (/)(x::GaussMod{N}, y::GaussMod{N}) where N = x * inv(y)
 (//)(x::GaussMod{N}, y::GaussMod{N}) where N = x/y
-#(//)(x::Number, y::GaussMod{N}) where N = x/y
-#(//)(x::GaussMod{N}, y::Number) where N = x/y
+(//)(x::Number, y::GaussMod{N}) where N = x/y
+(//)(x::GaussMod{N}, y::Number) where N = x/y
 
 
 show(io::IO, z::GaussMod{N}) where N = print(io,"GaussMod{$N}($(value(z)))")
 show(io::IO, ::MIME"text/plain", z::GaussMod{N}) where N = show(io, z)
 
 # Random
-rand(::Type{GaussMod{N,T}}) where {N,T} = GaussMod{N}(rand(T) + im*rand(T))
-rand(::Type{GaussMod{N,T}}, dims::Integer...) where {N,T} = GaussMod{N}.(rand(T,dims...)) + im*GaussMod{N,T}.(rand(T,dims...))
+rand(::Type{GaussMod{N}}, args::Integer...) where {N} = rand(GaussMod{N,Int}, args...)
+rand(::Type{GaussMod{N,T}}) where {N,T<:Integer} = GaussMod{N,T}(rand(T) + im*rand(T))
+rand(::Type{GaussMod{N,T}}, dims::Integer...) where {N,T} = GaussMod{N,T}.(rand(T,dims...)) + im*GaussMod{N,T}.(rand(T,dims...))
 
 promote_rule(::Type{GaussMod{N,T}}, ::Type{Mod{N,T2}}) where {N,T,T2} = GaussMod{N,promote_type(T,T2)}
 promote_rule(::Type{GaussMod{N,T}}, ::Type{T2}) where {N, T, T2<:Integer} = GaussMod{N,promote_type(T,T2)}
