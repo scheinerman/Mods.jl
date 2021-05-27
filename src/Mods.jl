@@ -3,7 +3,7 @@ module Mods
 import Base: isequal, (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
 import Base: zero, one, rand, conj
 
-export Mod, modulus, value, AbstractMod
+export Mod, modulus, value, AbstractMod, modnumber
 export isequal, ==, +, -, *, is_invertible, inv, /, ^
 export hash, CRT
 
@@ -18,16 +18,18 @@ end
 
 # safe constructors (slower)
 function Mod{N}(x::T) where {T<:Integer,N}
-    @assert N>1 "modulus must be at least 2"
+    @assert N isa Integer && N>1 "modulus must be at least 2"
     Mod{N,T}(x)
-end
-function Mod(x::Integer, N::Integer)
-    Mod{N}(mod(x,N))
 end
 
 # type casting
-Mod{N,T}(x::Mod{N,T2}) where {T,N,T2} = Mod{N,T}(T(x.val))
+Mod{N,T}(x::Mod{N,T2}) where {T<:Integer,N,T2<:Integer} = Mod{N,T}(T(x.val))
 Mod{N,T}(x::Mod{N,T}) where {T<:Integer,N} = x
+
+modnumber(x::Integer, N::Integer) = Mod{N}(x)
+
+show(io::IO, z::Mod{N}) where N = print(io,"Mod{$N}($(value(z)))")
+show(io::IO, ::MIME"text/plain", z::Mod{N}) where N = show(io, z)
 
 """
 `modulus(a::Mod)` returns the modulus of this `Mod` number.
@@ -49,7 +51,7 @@ julia> value(a)
 11
 ```
 """
-value(a::Mod) = a.val
+value(a::Mod{N}) where N = mod(a.val, N)
 
 zero(::Mod{N,T}) where {N,T} = Mod{N,T}(zero(T))
 zero(::Type{Mod{N,T}}) where {N,T} = Mod{N,T}(zero(T))
@@ -83,13 +85,13 @@ isequal(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = value(x)==value(y)
 end
 
 
-function -(x::Mod{M}) where M
-    return Mod(-x.val, M)
+function -(x::Mod{M,T}) where {M,T}
+    return Mod{M,T}(-x.val)  # Note: might break for UInt
 end
 
 -(x::Mod,y::Mod) = x + (-y)
 
-unsafe_mod(x, y) = x - (x ÷ y) * y
+unsafe_mod(x, y) = x - (x ÷ y) * y  # does not check `y` being positive
 
 @inline function *(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
     p, flag = Base.mul_with_overflow(x.val,y.val)
@@ -106,7 +108,7 @@ end
 `is_invertible(x::Mod)` determines if `x` is invertible.
 """
 function is_invertible(x::Mod{M})::Bool where M
-    return gcd(value(x),M) == 1
+    return gcd(x.val,M) == 1
 end
 
 
@@ -114,12 +116,12 @@ end
 `inv(x::Mod)` gives the multiplicative inverse of `x`.
 This may be abbreviated by `x'`.
 """
-function inv(x::Mod{M}) where M
+@inline function inv(x::Mod{M,T}) where {M,T}
     (g, v, ignore) = gcdx(x.val, M)
     if g != 1
         error("$x is not invertible")
     end
-    return Mod(v, M)
+    return Mod{M,T}(v)
 end
 
 function /(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
@@ -128,58 +130,20 @@ end
 
 (//)(x::Mod,y::Mod) = x/y
 
-
-# Operations with Integers
-
-(+)(x::Mod{M}, k::Integer) where M = Mod(k,M)+x
-(+)(k::Integer, x::Mod) = x+k
-
-(-)(x::Mod, k::Integer) = x + (-k)
-(-)(k::Integer, x::Mod) = (-x) + k
-
-(*)(x::Mod{M}, k::Integer) where M = Mod(k,M) * x
-(*)(k::Integer, x::Mod) = x*k
-
-(/)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
-(/)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
-
-
-(//)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
-(//)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
+#Base.convert(::Type{Mod{M,T}}, x::Integer) where {M,T} = Mod{M,T}(x)
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{T2}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
+Base.promote_rule(::Type{T2}, ::Type{Mod{M,T1}}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
+#Base.convert(::Type{Mod{M,T}}, x::Rational) where {M,T} = Mod{M}(x)
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Rational{T2}}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
+Base.promote_rule(::Type{Rational{T2}}, ::Type{Mod{M,T1}}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
 
 # Operations with rational numbers  
-
 Mod{N}(k::Rational) where N = Mod{N}(numerator(k))/Mod{N}(denominator(k))
-
-function +(x::Mod{N}, k::Rational) where N
-    return x + Mod{N}(k)
-end
-(+)(k::Rational,x::Mod) = x+k
-
-(-)(x::Mod,k::Rational) = x + (-k)
-(-)(k::Rational,x::Mod) = k + (-x)
-
-function (*)(x::Mod{N},k::Rational) where N
-    return x * Mod{N}(k)
-end
-(*)(k::Rational,x::Mod) = x*k
-
-function (/)(x::Mod,k::Rational)
-    return x * (1/k)
-end
-(/)(k::Rational,x::Mod) = k * inv(x)
-
-(//)(x::Mod,k::Rational) = x/k
-(//)(k::Rational,x::Mod) = k/x
-
-
-
-
-
+Mod{N,T}(k::Rational{T2}) where {N,T<:Integer,T2<:Integer} = Mod{N,T}(numerator(k))/Mod{N,T}(denominator(k))
 
 # Comparison with Integers
 
-isequal(x::Mod{M}, k::Integer) where M = mod(k,M) == x.val
+isequal(x::Mod{M}, k::Integer) where M = mod(k,M) == value(x)
 isequal(k::Integer, x::Mod) = isequal(x,k)
 (==)(x::Mod, k::Integer) = isequal(x,k)
 (==)(k::Integer, x::Mod) = isequal(x,k)

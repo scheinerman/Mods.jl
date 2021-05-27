@@ -2,7 +2,7 @@ using Test
 using Mods
 
 @testset "Constructors" begin 
-    @test Mod{17}() == 0
+    @test zero(Mod{17}) == 0
     @test Mod{17}(1) == GaussMod{17}(1,0)
     @test GaussMod{17}(1,2) == 1 + 2im
     a = Mod{17}(3)
@@ -46,12 +46,12 @@ end
     b = GaussMod{p}(5 + 5im)
 
     @test a + b == 8 + 4im
-    @test a + Mod{p}(11) == Mod{p}(14, 22)
+    @test a + Mod{p}(11) == GaussMod{p}(14, 22)
     @test -a == 20 + im
-    @test a - b == Mod{p}(3 - im - 5 - 5im)
+    @test a - b == modnumber(3 - im - 5 - 5im, p)
 
-    @test a * b == Mod{p}((3 - im) * (5 + 5im))
-    @test a / b == Mod{p}((3 - im) // (5 + 5im))
+    @test a * b == modnumber((3 - im) * (5 + 5im), p)
+    @test a / b == modnumber((3 - im) // (5 + 5im), p)
 
     @test a^(p * p - 1) == 1
     @test is_invertible(a)
@@ -59,12 +59,6 @@ end
 
     @test a / (1 + im) == a / GaussMod{p}(1 + im)
     @test imag(a * a') == 0
-
-
-
-
-
-
 end
 
 @testset "Large Modulus" begin
