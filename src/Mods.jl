@@ -85,8 +85,12 @@ isequal(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = value(x)==value(y)
 end
 
 
-function -(x::Mod{M,T}) where {M,T}
+function -(x::Mod{M,T}) where {M,T<:Signed}
     return Mod{M,T}(-x.val)  # Note: might break for UInt
+end
+
+function -(x::Mod{M,T}) where {M,T<:Unsigned}
+    return Mod{M,T}(M-value(x))
 end
 
 -(x::Mod,y::Mod) = x + (-y)
@@ -119,7 +123,8 @@ This may be abbreviated by `x'`.
 @inline function inv(x::Mod{M,T}) where {M,T}
     Mod{M,T}(_invmod(x.val, M))
 end
-@inline function _invmod(x, m)
+_invmod(x::Unsigned, m::Unsigned) = invmod(x, m)
+@inline function _invmod(x::Signed, m::Signed)
     (g, v, _) = gcdx(x, m)
     if g != 1
         error("$x (mod $m) is not invertible")

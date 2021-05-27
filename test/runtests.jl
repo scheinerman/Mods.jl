@@ -40,6 +40,32 @@ end
     @test a^(-1) == inv(a)
 end
 
+@testset "Mod arithmetic with UInt" begin
+    p = UInt(23)
+    a = Mod{p,UInt}(2)
+    b = Mod{p,UInt}(25)
+    @test a == b
+    @test a == 2
+    @test a == -21
+
+    b = Mod{p,UInt}(20)
+    @test a + b == 22
+    @test a - b == -18
+    @test a + a == 2a
+    @test 0 - a == -a
+
+    @test a * b == Mod{p,UInt}(17)
+    @test (a / b) * b == a
+    @test (b // a) * (2 // 1) == b
+    @test a * (2 // 3) == (2a) * inv(Mod{p,UInt}(3))
+
+    @test is_invertible(a)
+    @test !is_invertible(Mod{10,UInt}(4))
+
+    @test a^(p - 1) == 1
+    @test a^(-1) == inv(a)
+end
+
 @testset "GaussMod arithmetic" begin
     p = 23
     a = GaussMod{p}(3 - im)
