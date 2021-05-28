@@ -38,6 +38,9 @@ end
 
     @test a^(p - 1) == 1
     @test a^(-1) == inv(a)
+
+    @test Mod{p}(3//7) == 3//7
+    @test isequal(3//7,  Mod{p}(3//7))
 end
 
 @testset "Mod arithmetic with UInt" begin
@@ -46,11 +49,11 @@ end
     b = Mod{p,UInt}(25)
     @test a == b
     @test a == 2
-    @test a == -21
+    @test a == 25
 
     b = Mod{p,UInt}(20)
     @test a + b == 22
-    @test a - b == -18
+    @test a - b == 28
     @test a + a == 2a
     @test 0 - a == -a
 
@@ -191,5 +194,3 @@ end
     @test S == T
     @test union(S, T) == intersect(S, T)
 end
-
-

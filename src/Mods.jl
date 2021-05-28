@@ -1,11 +1,11 @@
 module Mods
 
-import Base: isequal, (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
-import Base: zero, one, rand, conj
+import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
+import Base: rand, conj
 
 export Mod, modulus, value, AbstractMod
-export isequal, ==, +, -, *, is_invertible, inv, /, ^
-export hash, CRT
+export is_invertible
+export CRT
 
 abstract type AbstractMod <: Number end
 
@@ -51,12 +51,6 @@ julia> value(a)
 """
 value(a::Mod{N}) where N = mod(a.val, N)
 
-zero(::Mod{N,T}) where {N,T} = Mod{N,T}(zero(T))
-zero(::Type{Mod{N,T}}) where {N,T} = Mod{N,T}(zero(T))
-
-one(::Mod{N,T}) where {N,T} = Mod{N,T}(one(T))
-one(::Type{Mod{N,T}}) where {N,T} = Mod{N,T}(one(T))
-
 function hash(x::Mod, h::UInt64= UInt64(0))
     v = value(x)
     m = modulus(x)
@@ -64,11 +58,8 @@ function hash(x::Mod, h::UInt64= UInt64(0))
 end
 
 # Test for equality
-isequal(x::Mod{N,T1}, y::Mod{M,T2}) where {M,N,T1,T2} = false
-isequal(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = value(x)==value(y)
-
-==(x::Mod,y::Mod) = isequal(x,y)
-
+==(x::Mod{N,T1}, y::Mod{M,T2}) where {M,N,T1,T2} = false
+==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = value(x)==value(y)
 
 # Easy arithmetic
 @inline function +(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
@@ -136,7 +127,7 @@ end
 (//)(x::Number, y::Mod{N}) where N = x/y
 (//)(x::Mod{N}, y::Number) where N = x/y
 
-Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Mod{N,T2}}) where {M,N,T1,T2<:Number} = error("can not promote types Mod{$M,$T1} and Mod{$N,$T2}")
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Mod{N,T2}}) where {M,N,T1,T2<:Number} = error("can not promote types `Mod{$M,$T1}`` and `Mod{$N,$T2}`")
 Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Mod{M,T2}}) where {M,T1,T2<:Number} = Mod{M,promote_type(T1, T2)}
 Base.promote_rule(::Type{Mod{M,T1}}, ::Type{T2}) where {M,T1,T2<:Number} = Mod{M,promote_type(T1, T2)}
 Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Rational{T2}}) where {M,T1,T2} = Mod{M,promote_type(T1, T2)}
@@ -144,20 +135,6 @@ Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Rational{T2}}) where {M,T1,T2} = Mod
 # Operations with rational numbers  
 Mod{N}(k::Rational) where N = Mod{N}(numerator(k))/Mod{N}(denominator(k))
 Mod{N,T}(k::Rational{T2}) where {N,T,T2} = Mod{N,T}(numerator(k))/Mod{N,T}(denominator(k))
-
-# Comparison with Integers, Complex et al
-isequal(x::Mod{M}, k::Number) where M = mod(k,M) == value(x)
-isequal(k::Number, x::Mod) = isequal(x,k)
-(==)(x::Mod, k::Number) = isequal(x,k)
-(==)(k::Number, x::Mod) = isequal(x,k)
-
-# Comparisons with Rationals
-function isequal(x::Mod{N}, k::Rational) where N
-    return x == Mod{N}(k)
-end
-isequal(k::Rational,x::Mod) = isequal(x,k)
-(==)(x::Mod, k::Rational) = isequal(x,k)
-(==)(k::Rational, x::Mod) = isequal(x,k)
 
 # Random
 rand(::Type{Mod{N}}, args::Integer...) where {N} = rand(Mod{N,Int}, args...)
