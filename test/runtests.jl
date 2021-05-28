@@ -3,14 +3,14 @@ using Mods
 
 @testset "Constructors" begin 
     @test zero(Mod{17}) == 0
-    @test Mod{17}(1) == GaussMod{17}(1,0)
-    @test GaussMod{17}(1,2) == 1 + 2im
+    @test Mod{17}(1) == Mod{17}(1,0)
+    @test Mod{17}(1,2) == 1 + 2im
     a = Mod{17}(3)
     @test typeof(a) == Mod{17,Int}
-    a = GaussMod{17}(3,2)
+    a = Mod{17}(3,2)
     @test typeof(a) == GaussMod{17,Int}
-    a = zero(GaussMod{17})
-    @test typeof(a) == GaussMod{17,Int}
+    a = zero(Mod{17})
+    @test typeof(a) == Mod{17,Int}
 end 
 
 
@@ -60,30 +60,36 @@ end
     @test a * (2 // 3) == (2a) * inv(Mod{p,UInt}(3))
 
     @test is_invertible(a)
-    @test !is_invertible(Mod{10,UInt}(4))
+    @test !is_invertible(Mod{10}(4))
 
     @test a^(p - 1) == 1
     @test a^(-1) == inv(a)
 end
 
 @testset "GaussMod arithmetic" begin
+    @test one(GaussMod{6}) == Mod{6}(1+0im)
+    @test zero(GaussMod{6}) == Mod{6}(0+0im)
+    @test GaussMod{6}(2 + 3im) == Mod{6}(2+3im)
+    @test GaussMod{6,Int}(2 + 3im) == Mod{6}(2+3im)
+    @test rand(GaussMod{6}) isa GaussMod
+    @test eltype(rand(GaussMod{6}, 4, 4)) <: GaussMod
     p = 23
-    a = GaussMod{p}(3 - im)
-    b = GaussMod{p}(5 + 5im)
+    a = Mod{p}(3 - im)
+    b = Mod{p}(5 + 5im)
 
     @test a + b == 8 + 4im
-    @test a + Mod{p}(11) == GaussMod{p}(14, 22)
+    @test a + Mod{p}(11) == Mod{p}(14, 22)
     @test -a == 20 + im
-    @test a - b == modnumber(3 - im - 5 - 5im, p)
+    @test a - b == Mod{p}(3 - im - 5 - 5im)
 
-    @test a * b == modnumber((3 - im) * (5 + 5im), p)
-    @test a / b == modnumber((3 - im) // (5 + 5im), p)
+    @test a * b == Mod{p}((3 - im) * (5 + 5im))
+    @test a / b == Mod{p}((3 - im) // (5 + 5im))
 
     @test a^(p * p - 1) == 1
     @test is_invertible(a)
     @test a * inv(a) == 1
 
-    @test a / (1 + im) == a / GaussMod{p}(1 + im)
+    @test a / (1 + im) == a / Mod{p}(1 + im)
     @test imag(a * a') == 0
 end
 
@@ -108,7 +114,7 @@ end
     @test p - x == x - 2x
 
     p = 9223372036854775783   # This is a large prime
-    x = GaussMod{p}(-2 + 0im)
+    x = Mod{p}(-2 + 0im)
     @test x * x == 4
     @test x + x == -4
     @test x / x == 1
@@ -159,7 +165,7 @@ end
     M = ones(Mod{11}, 5, 5)
     @test sum(M) == 3
 
-    M = rand(GaussMod{11}, 5, 6)
+    M = rand(Mod{11}, 5, 6)
     @test size(M) == (5, 6)
 
     A = rand(Mod{17}, 5, 5)
@@ -178,7 +184,7 @@ end
     @test length(A) == 1
 
     v = [Mod{10}(t) for t = 1:15]
-    w = [GaussMod{10}(t + 0im) for t = 1:15]
+    w = [Mod{10}(t + 0im) for t = 1:15]
     S = Set(v)
     T = Set(w)
     @test length(S) == 10

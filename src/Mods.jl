@@ -3,7 +3,7 @@ module Mods
 import Base: isequal, (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
 import Base: zero, one, rand, conj
 
-export Mod, modulus, value, AbstractMod, modnumber
+export Mod, modulus, value, AbstractMod
 export isequal, ==, +, -, *, is_invertible, inv, /, ^
 export hash, CRT
 
@@ -12,21 +12,19 @@ abstract type AbstractMod <: Number end
 """
 `Mod{m}(v)` creates a modular number in mod `m` with value `mod(v,m)`.
 """
-struct Mod{N,T<:Integer} <: AbstractMod
+struct Mod{N,T} <: AbstractMod
     val::T
 end
 
 # safe constructors (slower)
-function Mod{N}(x::T) where {T<:Integer,N}
+function Mod{N}(x::T) where {T<:Union{Integer,Complex{<:Integer}},N}
     @assert N isa Integer && N>1 "modulus must be at least 2"
     Mod{N,T}(x)
 end
 
 # type casting
-Mod{N,T}(x::Mod{N,T2}) where {T<:Integer,N,T2<:Integer} = Mod{N,T}(T(x.val))
-Mod{N,T}(x::Mod{N,T}) where {T<:Integer,N} = x
-
-modnumber(x::Integer, N::Integer) = Mod{N}(x)
+Mod{N,T}(x::Mod{N,T2}) where {T,N,T2} = Mod{N,T}(T(x.val))
+Mod{N,T}(x::Mod{N,T}) where {T,N} = x
 
 show(io::IO, z::Mod{N}) where N = print(io,"Mod{$N}($(value(z)))")
 show(io::IO, ::MIME"text/plain", z::Mod{N}) where N = show(io, z)
@@ -59,9 +57,7 @@ zero(::Type{Mod{N,T}}) where {N,T} = Mod{N,T}(zero(T))
 one(::Mod{N,T}) where {N,T} = Mod{N,T}(one(T))
 one(::Type{Mod{N,T}}) where {N,T} = Mod{N,T}(one(T))
 
-conj(x::Mod) = x   # so matrix transpose will work
-
-function hash(x::AbstractMod, h::UInt64= UInt64(0))
+function hash(x::Mod, h::UInt64= UInt64(0))
     v = value(x)
     m = modulus(x)
     return hash(v,hash(m,h))
@@ -140,23 +136,20 @@ end
 (//)(x::Number, y::Mod{N}) where N = x/y
 (//)(x::Mod{N}, y::Number) where N = x/y
 
-#Base.convert(::Type{Mod{M,T}}, x::Integer) where {M,T} = Mod{M,T}(x)
-Base.promote_rule(::Type{Mod{M,T1}}, ::Type{T2}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
-Base.promote_rule(::Type{T2}, ::Type{Mod{M,T1}}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
-#Base.convert(::Type{Mod{M,T}}, x::Rational) where {M,T} = Mod{M}(x)
-Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Rational{T2}}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
-Base.promote_rule(::Type{Rational{T2}}, ::Type{Mod{M,T1}}) where {M,T1<:Integer,T2<:Integer} = Mod{M,promote_type(T1, T2)}
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Mod{N,T2}}) where {M,N,T1,T2<:Number} = error("can not promote types Mod{$M,$T1} and Mod{$N,$T2}")
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Mod{M,T2}}) where {M,T1,T2<:Number} = Mod{M,promote_type(T1, T2)}
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{T2}) where {M,T1,T2<:Number} = Mod{M,promote_type(T1, T2)}
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Rational{T2}}) where {M,T1,T2} = Mod{M,promote_type(T1, T2)}
 
 # Operations with rational numbers  
 Mod{N}(k::Rational) where N = Mod{N}(numerator(k))/Mod{N}(denominator(k))
-Mod{N,T}(k::Rational{T2}) where {N,T<:Integer,T2<:Integer} = Mod{N,T}(numerator(k))/Mod{N,T}(denominator(k))
+Mod{N,T}(k::Rational{T2}) where {N,T,T2} = Mod{N,T}(numerator(k))/Mod{N,T}(denominator(k))
 
-# Comparison with Integers
-
-isequal(x::Mod{M}, k::Integer) where M = mod(k,M) == value(x)
-isequal(k::Integer, x::Mod) = isequal(x,k)
-(==)(x::Mod, k::Integer) = isequal(x,k)
-(==)(k::Integer, x::Mod) = isequal(x,k)
+# Comparison with Integers, Complex et al
+isequal(x::Mod{M}, k::Number) where M = mod(k,M) == value(x)
+isequal(k::Number, x::Mod) = isequal(x,k)
+(==)(x::Mod, k::Number) = isequal(x,k)
+(==)(k::Number, x::Mod) = isequal(x,k)
 
 # Comparisons with Rationals
 function isequal(x::Mod{N}, k::Rational) where N
@@ -166,11 +159,7 @@ isequal(k::Rational,x::Mod) = isequal(x,k)
 (==)(x::Mod, k::Rational) = isequal(x,k)
 (==)(k::Rational, x::Mod) = isequal(x,k)
 
-
-
-
 # Random
-
 rand(::Type{Mod{N}}, args::Integer...) where {N} = rand(Mod{N,Int}, args...)
 rand(::Type{Mod{N,T}}) where {N,T} = Mod{N}(rand(T))
 rand(::Type{Mod{N,T}},dims::Integer...) where {N,T} = Mod{N}.(rand(T,dims...))
