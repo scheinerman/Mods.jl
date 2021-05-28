@@ -59,7 +59,8 @@ end
 
 # Test for equality
 ==(x::Mod{N,T1}, y::Mod{M,T2}) where {M,N,T1,T2} = false
-==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = value(x)==value(y)
+==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = value(x) == value(y)
+==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1<:Signed,T2} = iszero(mod(x.val - y.val, N))
 
 # Easy arithmetic
 @inline function +(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
@@ -68,12 +69,16 @@ end
         return Mod{N,T}(s)
     end
     t = widen(x.val) + widen(y.val)    # add with added precision
-    return Mod{N,T}(unsafe_mod(t,N))
+    return Mod{N,T}(mod(t,N))
 end
 
 
 function -(x::Mod{M,T}) where {M,T<:Signed}
-    return Mod{M,T}(-x.val)  # Note: might break for UInt
+    if x.val === typemin(T)
+        return Mod{M,T}(-mod(x.val, M))
+    else
+        return Mod{M,T}(-x.val)
+    end
 end
 
 function -(x::Mod{M,T}) where {M,T<:Unsigned}
@@ -82,15 +87,13 @@ end
 
 -(x::Mod,y::Mod) = x + (-y)
 
-unsafe_mod(x, y) = x - (x ÷ y) * y  # does not check `y` being positive
-
 @inline function *(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
     p, flag = Base.mul_with_overflow(x.val,y.val)
     if !flag
         return Mod{N,T}(p)
     else
         q = widemul(x.val, y.val)         # multipy with added precision
-        return Mod{N,T}(unsafe_mod(q,N)) # return with proper type
+        return Mod{N,T}(mod(q,N)) # return with proper type
     end
 end
 
@@ -105,7 +108,6 @@ end
 
 """
 `inv(x::Mod)` gives the multiplicative inverse of `x`.
-This may be abbreviated by `x'`.
 """
 @inline function inv(x::Mod{M,T}) where {M,T}
     Mod{M,T}(_invmod(x.val, M))
@@ -158,9 +160,9 @@ julia> 92%14
 julia> CRT(BigInt, Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642))
 ```
 """
-function CRT(remainders, primes)
+function CRT(remainders, primes) where T
     length(remainders) == length(primes) || error("size mismatch")
-    isempty(remainders) && return 1
+    isempty(remainders) && throw(ArgumentError("input arguments should not be empty."))
     M = prod(primes)
     Ms = M .÷ primes
     ti = _invmod.(Ms, primes)
@@ -168,7 +170,6 @@ function CRT(remainders, primes)
 end
 
 function CRT(::Type{T}, rs::Mod...) where T
-    isempty(rs) && return 1
     CRT(convert.(T, value.(rs)), convert.(T, modulus.(rs)))
 end
 CRT(rs::Mod{<:Any, T}...) where T = CRT(T, rs...)

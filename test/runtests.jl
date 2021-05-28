@@ -2,7 +2,10 @@ using Test
 using Mods
 
 @testset "Constructors" begin 
+    @test one(Mod{17}) == Mod{17}(1)
+    @test oneunit(Mod{17}) == Mod{17}(1)
     @test zero(Mod{17}) == 0
+    @test iszero(zero(Mod{17}))
     @test Mod{17}(1) == Mod{17}(1,0)
     @test Mod{17}(1,2) == 1 + 2im
     a = Mod{17}(3)
@@ -11,6 +14,8 @@ using Mods
     @test typeof(a) == GaussMod{17,Int}
     a = zero(Mod{17})
     @test typeof(a) == Mod{17,Int}
+    a = Mod{17}(1//2 + (3//4)im)
+    @test typeof(a) == GaussMod{17,Int}
 end 
 
 
@@ -41,6 +46,8 @@ end
 
     @test Mod{p}(3//7) == 3//7
     @test isequal(3//7,  Mod{p}(3//7))
+
+    @test -Mod{13,Int}(typemin(Int)) == -Mod{13}(mod(typemin(Int), 13))
 end
 
 @testset "Mod arithmetic with UInt" begin
@@ -77,7 +84,7 @@ end
     @test rand(GaussMod{6}) isa GaussMod
     @test eltype(rand(GaussMod{6}, 4, 4)) <: GaussMod
     p = 23
-    a = Mod{p}(3 - im)
+    a = GaussMod{p}(3 - im)
     b = Mod{p}(5 + 5im)
 
     @test a + b == 8 + 4im
@@ -146,6 +153,7 @@ end
     a = Mod{p}(17)
     b = Mod{q}(32)
 
+    @test_throws ArgumentError CRT([], [])
     x = CRT(a, b)
     @test a == mod(x, p)
     @test b == mod(x, q)
