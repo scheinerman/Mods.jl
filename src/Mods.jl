@@ -74,7 +74,7 @@ end
 
 
 function -(x::Mod{M,T}) where {M,T<:Signed}
-    if x.val === typemin(T)
+    if (x.val isa BigInt || x.val == typemin(T))
         return Mod{M,T}(-mod(x.val, M))
     else
         return Mod{M,T}(-x.val)
@@ -113,6 +113,7 @@ end
     Mod{M,T}(_invmod(x.val, M))
 end
 _invmod(x::Unsigned, m::Unsigned) = invmod(x, m)
+# faster version of `Base.invmod`, only works for for signed types
 @inline function _invmod(x::Signed, m::Signed)
     (g, v, _) = gcdx(x, m)
     if g != 1
@@ -145,7 +146,9 @@ rand(::Type{Mod{N,T}},dims::Integer...) where {N,T} = Mod{N}.(rand(T,dims...))
 
 # Chinese remainder theorem functions
 """
-`CRT(m1, m2,...)`: Chinese Remainder Theorem
+    `CRT([T=BigInt, ]m1, m2,...)`
+
+Chinese Remainder Theorem.
 
 ```
 julia> CRT(Mod{11}(4), Mod{14}(814))
@@ -159,6 +162,12 @@ julia> 92%14
 
 julia> CRT(BigInt, Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642))
 ```
+
+!!! note
+
+    `CRT` uses `BigInt` by default to prevent potential integer overflow.
+    If you are confident that numbers does not overflow in your application,
+    please specify an optional type parameter as the first argument.
 """
 function CRT(remainders, primes) where T
     length(remainders) == length(primes) || error("size mismatch")
@@ -172,7 +181,7 @@ end
 function CRT(::Type{T}, rs::Mod...) where T
     CRT(convert.(T, value.(rs)), convert.(T, modulus.(rs)))
 end
-CRT(rs::Mod{<:Any, T}...) where T = CRT(T, rs...)
+CRT(rs::Mod...) = CRT(BigInt, rs...)
 
 include("GaussMods.jl")
 

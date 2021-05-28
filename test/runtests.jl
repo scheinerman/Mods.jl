@@ -155,11 +155,13 @@ end
 
     @test_throws ArgumentError CRT([], [])
     x = CRT(a, b)
+    @test typeof(x) <: BigInt
     @test a == mod(x, p)
     @test b == mod(x, q)
 
     c = Mod{101}(86)
-    x = CRT(a,b,c)
+    x = CRT(Int, a,b,c)
+    @test typeof(x) <: Int
 
     @test a == mod(x, p)
     @test b == mod(x, q)
