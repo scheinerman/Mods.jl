@@ -59,8 +59,7 @@ end
 
 # Test for equality
 ==(x::Mod{N,T1}, y::Mod{M,T2}) where {M,N,T1,T2} = false
-==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = value(x) == value(y)
-==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1<:Signed,T2} = iszero(mod(x.val - y.val, N))
+==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = iszero(x - y)
 
 # Easy arithmetic
 @inline function +(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
