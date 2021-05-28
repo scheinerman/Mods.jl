@@ -5,6 +5,10 @@ export GaussMod, AbstractMod
 # mod support for Gaussian integers until officially adopted into Base
 mod(z::Complex{<:Integer}, n::Integer) = Complex(mod(real(z), n), mod(imag(z), n))
 
+"""
+`GaussMod{N,T}` is an alias of `Mod{N,Complex{T}}`.
+It is for computing Gaussian Modulus.
+"""
 const GaussMod{N,T} = Mod{N,Complex{T}}
 GaussMod{N}(x::T) where {N, T<:Integer} = Mod{N,Complex{T}}(x)
 GaussMod{N}(x::T) where {N, T<:Complex} = Mod{N,T}(x)
