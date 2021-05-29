@@ -151,7 +151,7 @@ rand(::Type{Mod{N,T}},dims::Integer...) where {N,T} = Mod{N}.(rand(T,dims...))
 Chinese Remainder Theorem.
 
 ```
-julia> CRT(Mod{11}(4), Mod{14}(814))
+julia> CRT(Int, Mod{11}(4), Mod{14}(814))
 92
 
 julia> 92%11
@@ -160,7 +160,8 @@ julia> 92%11
 julia> 92%14
 8
 
-julia> CRT(BigInt, Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642))
+julia> CRT(Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642))
+85070591730234614113402964855534653468
 ```
 
 !!! note
@@ -169,17 +170,18 @@ julia> CRT(BigInt, Mod{9223372036854775783}(9223372036854775782), Mod{9223372036
     If you are confident that numbers does not overflow in your application,
     please specify an optional type parameter as the first argument.
 """
-function CRT(remainders, primes) where T
+function CRT(::Type{T}, remainders, primes) where T
     length(remainders) == length(primes) || error("size mismatch")
-    isempty(remainders) && throw(ArgumentError("input arguments should not be empty."))
+    isempty(remainders) && return zero(T)
+    primes = convert.(T, primes)
     M = prod(primes)
     Ms = M .÷ primes
     ti = _invmod.(Ms, primes)
-    mod(sum(remainders .* ti .* Ms), M)
+    mod(sum(convert.(T, remainders) .* ti .* Ms), M)
 end
 
 function CRT(::Type{T}, rs::Mod...) where T
-    CRT(convert.(T, value.(rs)), convert.(T, modulus.(rs)))
+    CRT(T, value.(rs), modulus.(rs))
 end
 CRT(rs::Mod...) = CRT(BigInt, rs...)
 

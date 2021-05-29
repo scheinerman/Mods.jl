@@ -153,7 +153,7 @@ end
     a = Mod{p}(17)
     b = Mod{q}(32)
 
-    @test_throws ArgumentError CRT([], [])
+    @test CRT(Int32, [], []) === Int32(0)
     x = CRT(a, b)
     @test typeof(x) <: BigInt
     @test a == mod(x, p)
