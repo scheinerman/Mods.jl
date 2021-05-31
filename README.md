@@ -4,17 +4,7 @@ Modular arithmetic for Julia.
 
 [![travis ci][travis-ci-img]][travis-ci-url]
 
-|||
-|---------------------:|:----------------------------------------------|
-| **Docs Build**       | [![docs build][docs-bld-img]][docs-bld-url]   |
-| **Documentation**    | [![dev][docs-dev-img]][docs-dev-url]          |
-| **Build Status**     | [![travis ci][travis-ci-img]][travis-ci-url]  |
 
-[docs-bld-img]: https://github.com/scheinerman/Mods.jl/workflows/Documentation/badge.svg
-[docs-bld-url]: https://github.com/scheinerman/Mods.jl/actions?query=workflow%3ADocumentation
-
-[docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://scheinerman.github.io/Mods.jl/dev/
 
 [travis-ci-img]: https://travis-ci.com/scheinerman/Mods.jl.svg?branch=master
 [travis-ci-url]: https://travis-ci.com/scheinerman/Mods.jl
