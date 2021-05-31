@@ -1,33 +1,33 @@
 module Mods
 
-import Base: isequal, (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
-import Base: zero, one, rand, conj
+import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
+import Base: rand, conj, iszero
 
 export Mod, modulus, value, AbstractMod
-export isequal, ==, +, -, *, is_invertible, inv, /, ^
-export hash, CRT
+export is_invertible
+export CRT
 
 abstract type AbstractMod <: Number end
 
 """
 `Mod{m}(v)` creates a modular number in mod `m` with value `mod(v,m)`.
-`Mod{m}()` is equivalent to `Mod{m}(0)`.
 """
-struct Mod{N} <: AbstractMod
-    val::Int
-    function Mod(x::Int,N::Int)
-        @assert N>1 "modulus must be at least 2"
-        new{N::Int}(mod(x,N))
-    end
+struct Mod{N,T} <: AbstractMod
+    val::T
 end
 
-Mod{N}(x::Int=0) where N = Mod(x,N)
-
-function Mod{N}(x::T) where {N,T<:Integer}
-    xx = mod(x,N)
-    return Mod{N}(Int(xx))
+# safe constructors (slower)
+function Mod{N}(x::T) where {T<:Union{Integer,Complex{<:Integer}},N}
+    @assert N isa Integer && N>1 "modulus must be at least 2"
+    Mod{N,T}(x)
 end
-Mod(x::T, N::Int) where T<:Integer = Mod{N}(x)
+
+# type casting
+Mod{N,T}(x::Mod{N,T2}) where {T,N,T2} = Mod{N,T}(T(x.val))
+Mod{N,T}(x::Mod{N,T}) where {T,N} = x
+
+show(io::IO, z::Mod{N}) where N = print(io,"Mod{$N}($(value(z)))")
+show(io::IO, ::MIME"text/plain", z::Mod{N}) where N = show(io, z)
 
 """
 `modulus(a::Mod)` returns the modulus of this `Mod` number.
@@ -49,70 +49,52 @@ julia> value(a)
 11
 ```
 """
-value(a::AbstractMod) = a.val
+value(a::Mod{N}) where N = mod(a.val, N)
 
-zero(::Mod{N}) where N = Mod{N}()
-zero(::Type{Mod{N}}) where N = Mod{N}()
-
-one(::Mod{N}) where N = Mod{N}(1)
-one(::Type{Mod{N}}) where N = Mod{N}(1)
-
-conj(x::Mod) = x   # so matrix transpose will work
-
-function hash(x::AbstractMod, h::UInt64= UInt64(0))
+function hash(x::Mod, h::UInt64= UInt64(0))
     v = value(x)
     m = modulus(x)
     return hash(v,hash(m,h))
 end
 
 # Test for equality
-isequal(x::Mod, y::Mod) = value(x)==value(y) && modulus(x)==modulus(y)
-
-==(x::Mod,y::Mod) = isequal(x,y)
-
-
-"""
-`modcheck(x::Mod,y::Mod)` checks if `x` and `y` have the same modulus.
-If so, return than modulus. If not, throw an error.
-"""
-function modcheck(x::Mod, y::Mod)::Int
-    mx = modulus(x)
-    my = modulus(y)
-    if mx != my
-        error("Cannot operate on two Mod objects with different moduli")
-    end
-    return mx
-end
+iszero(x::Mod{N,T}) where {N,T} = iszero(mod(x.val, N))
+==(x::Mod{N,T1}, y::Mod{M,T2}) where {M,N,T1,T2} = false
+==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = iszero(value(x - y))
 
 # Easy arithmetic
-function +(x::Mod, y::Mod)::Mod
-    m = modcheck(x,y)
-    s,flag = Base.add_with_overflow(x.val,y.val)
+@inline function +(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
+    s, flag = Base.add_with_overflow(x.val,y.val)
     if !flag
-        return Mod(x.val+y.val, m)
+        return Mod{N,T}(s)
     end
-    s = widen(x.val) + widen(y.val)    # add with added precision
-    s = Int(mod(s,m))                  # reduce by modulus
-    return Mod(s,m)
+    t = widen(x.val) + widen(y.val)    # add with added precision
+    return Mod{N,T}(mod(t,N))
 end
 
 
-function -(x::Mod{M}) where M
-    return Mod(-x.val, M)
+function -(x::Mod{M,T}) where {M,T<:Signed}
+    if (x.val isa BigInt || x.val == typemin(T))
+        return Mod{M,T}(-mod(x.val, M))
+    else
+        return Mod{M,T}(-x.val)
+    end
+end
+
+function -(x::Mod{M,T}) where {M,T<:Unsigned}
+    return Mod{M,T}(M-value(x))
 end
 
 -(x::Mod,y::Mod) = x + (-y)
 
-
-function *(x::Mod, y::Mod)
-    m = modcheck(x,y)
-    p,flag = Base.mul_with_overflow(x.val,y.val)
+@inline function *(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
+    p, flag = Base.mul_with_overflow(x.val,y.val)
     if !flag
-        return Mod(x.val*y.val, m)
+        return Mod{N,T}(p)
+    else
+        q = widemul(x.val, y.val)         # multipy with added precision
+        return Mod{N,T}(mod(q,N)) # return with proper type
     end
-    p = widemul(x.val, y.val)         # multipy with added precision
-    p = Int(mod(p,m))                  # reduce by the modulus
-    return Mod(p,m) # return with proper type
 end
 
 # Division stuff
@@ -120,153 +102,89 @@ end
 `is_invertible(x::Mod)` determines if `x` is invertible.
 """
 function is_invertible(x::Mod{M})::Bool where M
-    return gcd(value(x),M) == 1
+    return gcd(x.val,M) == 1
 end
 
 
 """
 `inv(x::Mod)` gives the multiplicative inverse of `x`.
-This may be abbreviated by `x'`.
 """
-function inv(x::Mod{M}) where M
-    (g, v, ignore) = gcdx(x.val, M)
+@inline function inv(x::Mod{M,T}) where {M,T}
+    Mod{M,T}(_invmod(x.val, M))
+end
+_invmod(x::Unsigned, m::Unsigned) = invmod(x, m)
+# faster version of `Base.invmod`, only works for for signed types
+@inline function _invmod(x::Signed, m::Signed)
+    (g, v, _) = gcdx(x, m)
     if g != 1
-        error("$x is not invertible")
+        error("$x (mod $m) is not invertible")
     end
-    return Mod(v, M)
+    return v
 end
 
-function /(x::Mod, y::Mod)
-    modcheck(x,y)
+function /(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
     return x * inv(y)
 end
 
 (//)(x::Mod,y::Mod) = x/y
+(//)(x::Number, y::Mod{N}) where N = x/y
+(//)(x::Mod{N}, y::Number) where N = x/y
 
-
-# Operations with Integers
-
-(+)(x::Mod{M}, k::Integer) where M = Mod(k,M)+x
-(+)(k::Integer, x::Mod) = x+k
-
-(-)(x::Mod, k::Integer) = x + (-k)
-(-)(k::Integer, x::Mod) = (-x) + k
-
-(*)(x::Mod{M}, k::Integer) where M = Mod(k,M) * x
-(*)(k::Integer, x::Mod) = x*k
-
-(/)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
-(/)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
-
-
-(//)(x::Mod{M}, k::Integer) where M = x / Mod(k, M)
-(//)(k::Integer, x::Mod{M}) where M = Mod(k, M) / x
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Mod{N,T2}}) where {M,N,T1,T2<:Number} = error("can not promote types `Mod{$M,$T1}`` and `Mod{$N,$T2}`")
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Mod{M,T2}}) where {M,T1,T2<:Number} = Mod{M,promote_type(T1, T2)}
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{T2}) where {M,T1,T2<:Number} = Mod{M,promote_type(T1, T2)}
+Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Rational{T2}}) where {M,T1,T2} = Mod{M,promote_type(T1, T2)}
 
 # Operations with rational numbers  
-
 Mod{N}(k::Rational) where N = Mod{N}(numerator(k))/Mod{N}(denominator(k))
-
-function +(x::Mod{N}, k::Rational) where N
-    return x + Mod{N}(k)
-end
-(+)(k::Rational,x::Mod) = x+k
-
-(-)(x::Mod,k::Rational) = x + (-k)
-(-)(k::Rational,x::Mod) = k + (-x)
-
-function (*)(x::Mod{N},k::Rational) where N
-    return x * Mod{N}(k)
-end
-(*)(k::Rational,x::Mod) = x*k
-
-function (/)(x::Mod,k::Rational)
-    return x * (1/k)
-end
-(/)(k::Rational,x::Mod) = k * inv(x)
-
-(//)(x::Mod,k::Rational) = x/k
-(//)(k::Rational,x::Mod) = k/x
-
-
-
-
-
-
-# Comparison with Integers
-
-isequal(x::Mod{M}, k::Integer) where M = mod(k,M) == x.val
-isequal(k::Integer, x::Mod) = isequal(x,k)
-(==)(x::Mod, k::Integer) = isequal(x,k)
-(==)(k::Integer, x::Mod) = isequal(x,k)
-
-# Comparisons with Rationals
-function isequal(x::Mod{N}, k::Rational) where N
-    return x == Mod{N}(k)
-end
-isequal(k::Rational,x::Mod) = isequal(x,k)
-(==)(x::Mod, k::Rational) = isequal(x,k)
-(==)(k::Rational, x::Mod) = isequal(x,k)
-
-
-
+Mod{N,T}(k::Rational{T2}) where {N,T,T2} = Mod{N,T}(numerator(k))/Mod{N,T}(denominator(k))
 
 # Random
-
-rand(::Type{Mod{N}}) where N = Mod{N}(rand(Int))
-rand(::Type{Mod{N}},dims::Integer...) where N = Mod{N}.(rand(Int,dims...))
-
-
+rand(::Type{Mod{N}}, args::Integer...) where {N} = rand(Mod{N,Int}, args...)
+rand(::Type{Mod{N,T}}) where {N,T} = Mod{N}(rand(T))
+rand(::Type{Mod{N,T}},dims::Integer...) where {N,T} = Mod{N}.(rand(T,dims...))
 
 # Chinese remainder theorem functions
-
-# private helper function
-function CRT_work(x::Mod{n}, y::Mod{m}) where {n,m}
-    # n = x.mod
-    # m = y.mod
-    if gcd(n,m) != 1
-        error("Moduli must be pairwise relatively prime")
-    end
-
-    a = x.val
-    b = y.val
-
-    k = inv(Mod(n,m)) * (b-a)
-
-    z = a + k.val*n
-
-    return Mod(z, n*m)
-end
-
-# public interface
 """
-`CRT(m1,m2,...)`: Chinese Remainder Theorem
+    `CRT([T=BigInt, ]m1, m2,...)`
+
+Chinese Remainder Theorem.
+
 ```
-julia> CRT( Mod(4,11), Mod(8,14) )
-Mods.Mod(92,154)
+julia> CRT(Int, Mod{11}(4), Mod{14}(814))
+92
 
 julia> 92%11
 4
 
 julia> 92%14
 8
+
+julia> CRT(Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642))
+85070591730234614113402964855534653468
 ```
+
+!!! note
+
+    `CRT` uses `BigInt` by default to prevent potential integer overflow.
+    If you are confident that numbers does not overflow in your application,
+    please specify an optional type parameter as the first argument.
 """
-function CRT(mtuple::Mod...)
-    n = length(mtuple)
-    if n == 0
-        return 1
-    end
-
-    result::Mod = mtuple[1]
-
-    for k=2:n
-        result = CRT_work(result,mtuple[k])
-    end
-
-    return result
+function CRT(::Type{T}, remainders, primes) where T
+    length(remainders) == length(primes) || error("size mismatch")
+    isempty(remainders) && return zero(T)
+    primes = convert.(T, primes)
+    M = prod(primes)
+    Ms = M .÷ primes
+    ti = _invmod.(Ms, primes)
+    mod(sum(convert.(T, remainders) .* ti .* Ms), M)
 end
 
-include("GaussMods.jl")
+function CRT(::Type{T}, rs::Mod...) where T
+    CRT(T, value.(rs), modulus.(rs))
+end
+CRT(rs::Mod...) = CRT(BigInt, rs...)
 
+include("GaussMods.jl")
 
 end # end of module Mods

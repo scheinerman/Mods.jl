@@ -149,7 +149,7 @@ julia> b = Mod{9}(1)
 Mod{9}(1)
 
 julia> a+b
-ERROR: Cannot operate on two Mod objects with different moduli
+ERROR: can not promote types Mod{10,Int64} and Mod{9,Int64}
 ```
 
 
@@ -190,9 +190,6 @@ julia> reim(a)
 (Mod{10}(2), Mod{10}(7))
 ```
 
-
-
-
 #### Complex conjugate
 Use `a'` (or `conj(a)`) to get the complex conjugate value:
 ```julia
@@ -211,10 +208,10 @@ Mod{10}(4 + 0im)
 
 ### Inspection
 
-Given a `Mod` or `GaussMod` number, the modulus is recovered using the `modulus`
+Given a `Mod` number, the modulus is recovered using the `modulus`
 function and the numerical value with `value`:
 ```julia
-ulia> a = Mod{23}(100)
+julia> a = Mod{23}(100)
 Mod{23}(8)
 
 julia> modulus(a)
@@ -252,7 +249,7 @@ Mod{1000000000000000000}(0)
 ### Zeros and ones
 
 The standard Julia functions `zero`, `zeros`, `one`, and `ones` may be used
-with `Mod` and `GaussMod` types:
+with `Mod` types:
 ```julia
 julia> zero(Mod{9})
 Mod{9}(0)
@@ -271,11 +268,11 @@ julia> ones(GaussMod{5},4)
  Mod{5}(1 + 0im)
  Mod{5}(1 + 0im)
  Mod{5}(1 + 0im)
- ```
+```
 
 ### Random values
 
-The `rand` function can be used to produce random `Mod` or `GaussMod` values:
+The `rand` function can be used to produce random `Mod` values:
 ```julia
 julia> rand(Mod{17})
 Mod{17}(13)
@@ -313,11 +310,11 @@ problem as illustrated here with `a=3`, `m=10`, `b=5`, and `n=17`:
 julia> s = Mod{10}(3); t = Mod{17}(5);
 
 julia> CRT(s,t)
-Mod{170}(73)
+73
 ```
 
 We find that `mod(73,10)` equals `3` and `mod(73,17)` equals `5` as
-required. The answer is reported as `Mod{170}(73)` because any value of
+required. The answer is reported as `73` because any value of
 `x` congruent to 73 modulo 170 is a solution.
 
 The `CRT` function can be applied to any number of arguments so long

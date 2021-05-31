@@ -2,15 +2,20 @@ using Test
 using Mods
 
 @testset "Constructors" begin 
-    @test Mod{17}() == 0
-    @test Mod{17}(1) == GaussMod{17}(1,0)
+    @test one(Mod{17}) == Mod{17}(1)
+    @test oneunit(Mod{17}) == Mod{17}(1)
+    @test zero(Mod{17}) == 0
+    @test iszero(zero(Mod{17}))
+    @test Mod{17}(1) == Mod{17}(1,0)
     @test Mod{17}(1,2) == 1 + 2im
     a = Mod{17}(3)
-    @test typeof(a) == Mod{17}
+    @test typeof(a) == Mod{17,Int}
     a = Mod{17}(3,2)
-    @test typeof(a) == GaussMod{17}
-    a = GaussMod{17}()
-    @test typeof(a) == GaussMod{17}
+    @test typeof(a) == GaussMod{17,Int}
+    a = zero(Mod{17})
+    @test typeof(a) == Mod{17,Int}
+    a = Mod{17}(1//2 + (3//4)im)
+    @test typeof(a) == GaussMod{17,Int}
 end 
 
 
@@ -38,12 +43,49 @@ end
 
     @test a^(p - 1) == 1
     @test a^(-1) == inv(a)
+
+    @test Mod{p}(3//7) == 3//7
+    @test isequal(3//7,  Mod{p}(3//7))
+
+    @test -Mod{13,Int}(typemin(Int)) == -Mod{13}(mod(typemin(Int), 13))
+end
+
+@testset "Mod arithmetic with UInt" begin
+    p = UInt(23)
+    a = Mod{p,UInt}(2)
+    b = Mod{p,UInt}(25)
+    @test a == b
+    @test a == 2
+    @test a == 25
+
+    b = Mod{p,UInt}(20)
+    @test a + b == 22
+    @test a - b == 28
+    @test a + a == 2a
+    @test 0 - a == -a
+
+    @test a * b == Mod{p,UInt}(17)
+    @test (a / b) * b == a
+    @test (b // a) * (2 // 1) == b
+    @test a * (2 // 3) == (2a) * inv(Mod{p,UInt}(3))
+
+    @test is_invertible(a)
+    @test !is_invertible(Mod{10}(4))
+
+    @test a^(p - 1) == 1
+    @test a^(-1) == inv(a)
 end
 
 @testset "GaussMod arithmetic" begin
+    @test one(GaussMod{6}) == Mod{6}(1+0im)
+    @test zero(GaussMod{6}) == Mod{6}(0+0im)
+    @test GaussMod{6}(2 + 3im) == Mod{6}(2+3im)
+    @test GaussMod{6,Int}(2 + 3im) == Mod{6}(2+3im)
+    @test rand(GaussMod{6}) isa GaussMod
+    @test eltype(rand(GaussMod{6}, 4, 4)) <: GaussMod
     p = 23
     a = GaussMod{p}(3 - im)
-    b = GaussMod{p}(5 + 5im)
+    b = Mod{p}(5 + 5im)
 
     @test a + b == 8 + 4im
     @test a + Mod{p}(11) == Mod{p}(14, 22)
@@ -57,14 +99,8 @@ end
     @test is_invertible(a)
     @test a * inv(a) == 1
 
-    @test a / (1 + im) == a / GaussMod{p}(1 + im)
+    @test a / (1 + im) == a / Mod{p}(1 + im)
     @test imag(a * a') == 0
-
-
-
-
-
-
 end
 
 @testset "Large Modulus" begin
@@ -117,17 +153,21 @@ end
     a = Mod{p}(17)
     b = Mod{q}(32)
 
+    @test CRT(Int32, [], []) === Int32(0)
     x = CRT(a, b)
-    @test a == mod(value(x), p)
-    @test b == mod(value(x), q)
+    @test typeof(x) <: BigInt
+    @test a == mod(x, p)
+    @test b == mod(x, q)
 
     c = Mod{101}(86)
-    x = CRT(a,b,c)
+    x = CRT(Int, a,b,c)
+    @test typeof(x) <: Int
 
-    @test a == mod(value(x), p)
-    @test b == mod(value(x), q)
-    @test c == mod(value(x), 101)
+    @test a == mod(x, p)
+    @test b == mod(x, q)
+    @test c == mod(x, 101)
 
+    @test  CRT(BigInt, Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642)) == 85070591730234614113402964855534653468
 end
 
 
@@ -138,7 +178,7 @@ end
     M = ones(Mod{11}, 5, 5)
     @test sum(M) == 3
 
-    M = rand(GaussMod{11}, 5, 6)
+    M = rand(Mod{11}, 5, 6)
     @test size(M) == (5, 6)
 
     A = rand(Mod{17}, 5, 5)
@@ -164,5 +204,3 @@ end
     @test S == T
     @test union(S, T) == intersect(S, T)
 end
-
-
