@@ -2,6 +2,7 @@
 
 Modular arithmetic for Julia.
 
+[![travis ci][travis-ci-img]][travis-ci-url]
 
 |||
 |---------------------:|:----------------------------------------------|
