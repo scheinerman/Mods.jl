@@ -285,6 +285,25 @@ julia> [k*k for k ∈ Mod{7}]
  Mod{7}(2)
  Mod{7}(4)
  Mod{7}(1)
+
+julia> prod(k for k in Mod{5} if k!=0) == -1  # Wilson's theorem
+true
+```
+
+One can also use `GaussMod` as an iterator:
+```julia
+julia> for z in GaussMod{3}
+       println(z)
+       end
+Mod{3}(0 + 0im)
+Mod{3}(0 + 1im)
+Mod{3}(0 + 2im)
+Mod{3}(1 + 0im)
+Mod{3}(1 + 1im)
+Mod{3}(1 + 2im)
+Mod{3}(2 + 0im)
+Mod{3}(2 + 1im)
+Mod{3}(2 + 2im)
 ```
 
 

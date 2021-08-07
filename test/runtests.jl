@@ -213,4 +213,8 @@ end
 @testset "Iteration" begin
     @test sum(k for k in Mod{7}) == zero(Mod{7})
     @test collect(Mod{7}) == Mod{7}.(0:6)
+    @test prod(k for k in Mod{7} if k != 0) == -1  # Wilson's theorem
+
+    @test sum(GaussMod{7}) == 0
+    @test length(GaussMod{5}) == 25
 end
