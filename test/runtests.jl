@@ -1,22 +1,22 @@
 using Test
 using Mods
 
-@testset "Constructors" begin 
+@testset "Constructors" begin
     @test one(Mod{17}) == Mod{17}(1)
     @test oneunit(Mod{17}) == Mod{17}(1)
     @test zero(Mod{17}) == 0
     @test iszero(zero(Mod{17}))
-    @test Mod{17}(1) == Mod{17}(1,0)
-    @test Mod{17}(1,2) == 1 + 2im
+    @test Mod{17}(1) == Mod{17}(1, 0)
+    @test Mod{17}(1, 2) == 1 + 2im
     a = Mod{17}(3)
     @test typeof(a) == Mod{17,Int}
-    a = Mod{17}(3,2)
+    a = Mod{17}(3, 2)
     @test typeof(a) == GaussMod{17,Int}
     a = zero(Mod{17})
     @test typeof(a) == Mod{17,Int}
-    a = Mod{17}(1//2 + (3//4)im)
+    a = Mod{17}(1 // 2 + (3 // 4)im)
     @test typeof(a) == GaussMod{17,Int}
-end 
+end
 
 
 @testset "Mod arithmetic" begin
@@ -44,8 +44,8 @@ end
     @test a^(p - 1) == 1
     @test a^(-1) == inv(a)
 
-    @test Mod{p}(3//7) == 3//7
-    @test isequal(3//7,  Mod{p}(3//7))
+    @test Mod{p}(3 // 7) == 3 // 7
+    @test isequal(3 // 7, Mod{p}(3 // 7))
 
     @test -Mod{13,Int}(typemin(Int)) == -Mod{13}(mod(typemin(Int), 13))
 end
@@ -77,10 +77,10 @@ end
 end
 
 @testset "GaussMod arithmetic" begin
-    @test one(GaussMod{6}) == Mod{6}(1+0im)
-    @test zero(GaussMod{6}) == Mod{6}(0+0im)
-    @test GaussMod{6}(2 + 3im) == Mod{6}(2+3im)
-    @test GaussMod{6,Int}(2 + 3im) == Mod{6}(2+3im)
+    @test one(GaussMod{6}) == Mod{6}(1 + 0im)
+    @test zero(GaussMod{6}) == Mod{6}(0 + 0im)
+    @test GaussMod{6}(2 + 3im) == Mod{6}(2 + 3im)
+    @test GaussMod{6,Int}(2 + 3im) == Mod{6}(2 + 3im)
     @test rand(GaussMod{6}) isa GaussMod
     @test eltype(rand(GaussMod{6}, 4, 4)) <: GaussMod
     p = 23
@@ -160,14 +160,18 @@ end
     @test b == mod(x, q)
 
     c = Mod{101}(86)
-    x = CRT(Int, a,b,c)
+    x = CRT(Int, a, b, c)
     @test typeof(x) <: Int
 
     @test a == mod(x, p)
     @test b == mod(x, q)
     @test c == mod(x, 101)
 
-    @test  CRT(BigInt, Mod{9223372036854775783}(9223372036854775782), Mod{9223372036854775643}(9223372036854775642)) == 85070591730234614113402964855534653468
+    @test CRT(
+        BigInt,
+        Mod{9223372036854775783}(9223372036854775782),
+        Mod{9223372036854775643}(9223372036854775642),
+    ) == 85070591730234614113402964855534653468
 end
 
 
@@ -193,7 +197,7 @@ end
     @test hash(x) == hash(y)
     @test typeof(x) !== typeof(y)
 
-    A = Set([x,y])
+    A = Set([x, y])
     @test length(A) == 1
 
     v = [Mod{10}(t) for t = 1:15]
@@ -203,4 +207,10 @@ end
     @test length(S) == 10
     @test S == T
     @test union(S, T) == intersect(S, T)
+end
+
+
+@testset "Iteration" begin
+    @test sum(k for k in Mod{7}) == zero(Mod{7})
+    @test collect(Mod{7}) == Mod{7}.(0:6)
 end

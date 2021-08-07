@@ -186,5 +186,6 @@ end
 CRT(rs::Mod...) = CRT(BigInt, rs...)
 
 include("GaussMods.jl")
+include("iterate.jl")
 
 end # end of module Mods

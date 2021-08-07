@@ -2,13 +2,6 @@
 
 Modular arithmetic for Julia.
 
-[![travis ci][travis-ci-img]][travis-ci-url]
-
-
-
-[travis-ci-img]: https://travis-ci.com/scheinerman/Mods.jl.svg?branch=master
-[travis-ci-url]: https://travis-ci.com/scheinerman/Mods.jl
-
 
 ## Quick Overview
 This module supports modular values and arithmetic. The moduli are integers (at least 2)
@@ -260,6 +253,40 @@ julia> ones(GaussMod{5},4)
  Mod{5}(1 + 0im)
  Mod{5}(1 + 0im)
 ```
+
+### Iteration
+
+The `Mod{m}` type can be used as an iterator (in `for` statements and list comprehension):
+```julia
+julia> for a in Mod{5}
+       println(a)
+       end
+Mod{5}(0)
+Mod{5}(1)
+Mod{5}(2)
+Mod{5}(3)
+Mod{5}(4)
+
+julia> collect(Mod{6})
+6-element Vector{Mod{6, T} where T}:
+ Mod{6}(0)
+ Mod{6}(1)
+ Mod{6}(2)
+ Mod{6}(3)
+ Mod{6}(4)
+ Mod{6}(5)
+
+julia> [k*k for k ∈ Mod{7}]
+7-element Vector{Mod{7, Int64}}:
+ Mod{7}(0)
+ Mod{7}(1)
+ Mod{7}(4)
+ Mod{7}(2)
+ Mod{7}(2)
+ Mod{7}(4)
+ Mod{7}(1)
+```
+
 
 ### Random values
 
