@@ -218,3 +218,11 @@ end
     @test sum(GaussMod{7}) == 0
     @test length(GaussMod{5}) == 25
 end
+
+@testset "Linear system solution" begin
+    A = Mod{13}.([1 2; 3 -4])
+    b = Mod{13}.([3, 4])
+    x = A \ b
+    @test A * x == b
+    @test inv(A) * b == x
+end

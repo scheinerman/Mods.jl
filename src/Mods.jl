@@ -51,7 +51,7 @@ julia> value(a)
 """
 value(a::Mod{N}) where {N} = mod(a.val, N)
 
-Base.abs(a::Mod{N, <:Real} where N) = abs(value(a))
+Base.abs(a::Mod{N,<:Real} where {N}) = abs(value(a))
 
 function hash(x::Mod, h::UInt64 = UInt64(0))
     v = value(x)
@@ -173,7 +173,7 @@ julia> CRT(Mod{9223372036854775783}(9223372036854775782), Mod{922337203685477564
 !!! note
 
     `CRT` uses `BigInt` by default to prevent potential integer overflow.
-    If you are confident that numbers does not overflow in your application,
+    If you are confident that numbers do not overflow in your application,
     please specify an optional type parameter as the first argument.
 """
 function CRT(::Type{T}, remainders, primes) where {T}
