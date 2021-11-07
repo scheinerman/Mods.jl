@@ -51,6 +51,8 @@ julia> value(a)
 """
 value(a::Mod{N}) where {N} = mod(a.val, N)
 
+Base.abs(a::Mod{N, <:Real} where N) = abs(value(a))
+
 function hash(x::Mod, h::UInt64 = UInt64(0))
     v = value(x)
     m = modulus(x)
@@ -139,7 +141,7 @@ Base.promote_rule(::Type{Mod{M,T1}}, ::Type{T2}) where {M,T1,T2<:Number} =
 Base.promote_rule(::Type{Mod{M,T1}}, ::Type{Rational{T2}}) where {M,T1,T2} =
     Mod{M,promote_type(T1, T2)}
 
-# Operations with rational numbers  
+# Operations with rational numbers
 Mod{N}(k::Rational) where {N} = Mod{N}(numerator(k)) / Mod{N}(denominator(k))
 Mod{N,T}(k::Rational{T2}) where {N,T,T2} = Mod{N,T}(numerator(k)) / Mod{N,T}(denominator(k))
 
