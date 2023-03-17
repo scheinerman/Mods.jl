@@ -1,7 +1,7 @@
 module Mods
 
 import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
-import Base: rand, conj, iszero
+import Base: rand, conj, iszero, rtoldefault, isapprox
 
 export Mod, modulus, value, AbstractMod
 export is_invertible
@@ -60,9 +60,14 @@ function hash(x::Mod, h::UInt64 = UInt64(0))
 end
 
 # Test for equality
-iszero(x::Mod{N,T}) where {N,T} = iszero(mod(x.val, N))
-==(x::Mod{N,T1}, y::Mod{M,T2}) where {M,N,T1,T2} = false
-==(x::Mod{N,T1}, y::Mod{N,T2}) where {N,T1,T2} = iszero(value(x - y))
+iszero(x::Mod{N}) where N = iszero(mod(x.val, N))
+==(x::Mod, y::Mod) = false
+==(x::Mod{N}, y::Mod{N}) where N = iszero(value(x - y))
+
+# Apporximate equality
+rtoldefault(::Type{Mod{N, T}}) where {N, T} = rtoldefault(T)
+isapprox(x::Mod, y::Mod; kwargs...) = false
+isapprox(x::Mod{N}, y::Mod{N}; kwargs...) where N = isapprox(value(x), value(y); kwargs...) || isapprox(value(y), value(x); kwargs...)
 
 # Easy arithmetic
 @inline function +(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
