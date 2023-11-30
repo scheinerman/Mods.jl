@@ -12,7 +12,7 @@ An element of $\mathbb{Z}_N[i]$ is entered a `Mod{N}(a+b*im)` and is of type
 `GaussMod{N}`. Both types are fully interoperable with each other and with 
 (ordinary) integers and Gaussian integers.
 
-```julia
+```
 julia> a = Mod{17}(9); b = Mod{17}(10);
 
 julia> a+b
@@ -46,7 +46,7 @@ AbstractMod
 Integers modulo `N` (where `N>1`) are values in the set 
 `{0,1,2,...,N-1}`. All arithmetic takes place modulo `N`. To create a mod-`N` number 
 we use `Mod{N}(a)`. For example:
-```julia
+```
 julia> Mod{10}(3)
 Mod{10}(3)
 
@@ -59,7 +59,7 @@ Mod{10}(7)
 The usual arithmetic operations may be used. Furthermore, oridinary integers can be 
 combined with `Mod` values. However, values of different moduli cannot be used
 together in an arithmetic expression. 
-```julia
+```
 julia> a = Mod{10}(5)
 Mod{10}(5)
 
@@ -79,7 +79,7 @@ julia> 2b
 Mod{10}(2)
 ```
 Division is permitted, but if the denominator is not invertible, an error is thrown.
-```julia
+```
 julia> a = Mod{10}(5)
 Mod{10}(5)
 
@@ -93,7 +93,7 @@ julia> b/a
 ERROR: Mod{10}(5) is not invertible
 ```
 Exponentiation by an integer is permitted.
-```julia
+```
 julia> a = Mod{17}(2)
 Mod{17}(2)
 
@@ -104,7 +104,7 @@ julia> a^(-3)
 Mod{17}(15)
 ```
 Invertibility can be checked with `is_invertible`.
-```julia
+```
 julia> a = Mod{10}(3)
 Mod{10}(3)
 
@@ -125,7 +125,7 @@ ERROR: Mod{10}(4) is not invertible
 ```
 
 Modular number with different moduli cannot be combined using the usual operations.
-```julia
+```
 julia> a = Mod{10}(1)
 Mod{10}(1)
 
@@ -142,7 +142,7 @@ ERROR: can not promote types Mod{10,Int64} and Mod{9,Int64}
 
 We can also work modulo `N` with Gaussian integers (numbers of the form `a+b*im` where `a`
 and `b` are integers).
-```julia
+```
 julia> a = Mod{10}(2-3im)
 Mod{10}(2 + 7im)
 
@@ -160,7 +160,7 @@ to `GaussMod` values.
 
 #### Real and imaginary parts
 * Use the functions `real` and `imag` (or `reim`) to extract the real and imaginary parts:
-```julia
+```
 julia> a = Mod{10}(2-3im)
 Mod{10}(2 + 7im)
 
@@ -176,7 +176,7 @@ julia> reim(a)
 
 #### Complex conjugate
 Use `a'` (or `conj(a)`) to get the complex conjugate value:
-```julia
+```
 julia> a = Mod{10}(2-3im)
 Mod{10}(2 + 7im)
 
@@ -194,7 +194,7 @@ Mod{10}(4 + 0im)
 
 Given a `Mod` number, the modulus is recovered using the `modulus`
 function and the numerical value with `value`:
-```julia
+```
 julia> a = Mod{23}(100)
 Mod{23}(8)
 
@@ -211,7 +211,7 @@ julia> value(a)
 Integer operations on 64-bit numbers can give results requiring more than
 64 bits. Fortunately, when working with modular numbers the results of
 the operations are bounded by the modulus.
-```julia
+```
 julia> N = 10^18                # this is a 60-bit number
 1000000000000000000
 
@@ -234,7 +234,7 @@ Mod{1000000000000000000}(0)
 
 The standard Julia functions `zero`, `zeros`, `one`, and `ones` may be used
 with `Mod` types:
-```julia
+```
 julia> zero(Mod{9})
 Mod{9}(0)
 
@@ -257,7 +257,7 @@ julia> ones(GaussMod{5},4)
 ### Iteration
 
 The `Mod{m}` type can be used as an iterator (in `for` statements and list comprehension):
-```julia
+```
 julia> for a in Mod{5}
        println(a)
        end
@@ -291,7 +291,7 @@ true
 ```
 
 One can also use `GaussMod` as an iterator:
-```julia
+```
 julia> for z in GaussMod{3}
        println(z)
        end
@@ -310,7 +310,7 @@ Mod{3}(2 + 2im)
 ### Random values
 
 The `rand` function can be used to produce random `Mod` values:
-```julia
+```
 julia> rand(Mod{17})
 Mod{17}(13)
 
@@ -320,7 +320,7 @@ Mod{17}(3 + 6im)
 
 With extra arguments, `rand` produces random vectors or matrices populated with 
 modular numbers:
-```julia
+```
 julia> rand(GaussMod{10},4)
 4-element Array{GaussMod{10},1}:
  Mod{10}(6 + 0im)
@@ -343,7 +343,7 @@ integer `x` such that `mod(x,m)==mod(a,m)` and
 `mod(x,n)==mod(b,n)`. We provide the `CRT` function to solve this
 problem as illustrated here with `a=3`, `m=10`, `b=5`, and `n=17`:
 
-```julia
+```
 julia> s = Mod{10}(3); t = Mod{17}(5);
 
 julia> CRT(s,t)
@@ -382,7 +382,7 @@ The `Mod` and `GaussMod` types work well with my
 [SimplePolynomials](https://github.com/scheinerman/SimplePolynomials.jl) and [LinearAlgebraX](https://github.com/scheinerman/LinearAlgebraX.jl) modules.
 
 
-```julia
+```
 julia> using LinearAlgebraX
 
 julia> A = rand(GaussMod{13},3,3)
