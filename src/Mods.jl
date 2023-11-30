@@ -17,10 +17,21 @@ struct Mod{N,T} <: AbstractMod
 end
 
 # safe constructors (slower)
-function Mod{N}(x::T) where {T<:Union{Integer,Complex{<:Integer}},N}
-    @assert N isa Integer && N > 1 "modulus must be at least 2"
-    Mod{N,T}(x)
+function Mod{N}(x::T) where {T<:Integer,N}
+    @assert N isa Integer && N > 1 "modulus must be an integer and at least 2"
+    S = typeof(N)
+    v = mod(x, N)
+    Mod{N,S}(v)
 end
+
+function Mod{N}(x::T) where {T<:Complex{<:Integer},N}
+    @assert N isa Integer && N > 1 "modulus must be an integer and at least 2"
+    S = Complex{typeof(N)}
+    v = mod(x, N)
+    Mod{N,S}(v)
+end
+
+
 
 # type casting
 Mod{N,T}(x::Mod{N,T2}) where {T,N,T2} = Mod{N,T}(T(x.val))
@@ -49,7 +60,7 @@ julia> value(a)
 11
 ```
 """
-value(a::Mod{N}) where {N} = mod(a.val, N)
+value(a::Mod{N}) where {N} = a.val
 
 Base.abs(a::Mod{N,<:Real} where {N}) = abs(value(a))
 
@@ -60,14 +71,15 @@ function hash(x::Mod, h::UInt64 = UInt64(0))
 end
 
 # Test for equality
-iszero(x::Mod{N}) where N = iszero(mod(x.val, N))
-==(x::Mod, y::Mod) = false
-==(x::Mod{N}, y::Mod{N}) where N = iszero(value(x - y))
+iszero(x::Mod{N}) where {N} = iszero(x.val)
+==(x::Mod, y::Mod) = modulus(x) == modulus(y) && value(y) == value(y)
+# ==(x::Mod{N}, y::Mod{N}) where {N} = iszero(value(x - y))
 
 # Apporximate equality
-rtoldefault(::Type{Mod{N, T}}) where {N, T} = rtoldefault(T)
+rtoldefault(::Type{Mod{N,T}}) where {N,T} = rtoldefault(T)
 isapprox(x::Mod, y::Mod; kwargs...) = false
-isapprox(x::Mod{N}, y::Mod{N}; kwargs...) where N = isapprox(value(x), value(y); kwargs...) || isapprox(value(y), value(x); kwargs...)
+isapprox(x::Mod{N}, y::Mod{N}; kwargs...) where {N} =
+    isapprox(value(x), value(y); kwargs...) || isapprox(value(y), value(x); kwargs...)
 
 # Easy arithmetic
 @inline function +(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
