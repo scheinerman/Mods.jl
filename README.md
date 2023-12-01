@@ -124,7 +124,7 @@ julia> inv(a)
 ERROR: Mod{10}(4) is not invertible
 ```
 
-Modular number with different moduli cannot be combined using the usual operations.
+Modular numbers with different moduli cannot be combined using the usual operations.
 ```
 julia> a = Mod{10}(1)
 Mod{10}(1)
