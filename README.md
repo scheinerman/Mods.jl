@@ -41,7 +41,7 @@ AbstractMod
 ```
 
 ## Basics 
-### `Mod` numbers
+### Mod numbers
 
 Integers modulo `N` (where `N>1`) are values in the set 
 `{0,1,2,...,N-1}`. All arithmetic takes place modulo `N`. To create a mod-`N` number 
@@ -138,7 +138,7 @@ ERROR: can not promote types Mod{10,Int64} and Mod{9,Int64}
 
 
 
-### `GaussMod` numbers
+### GaussMod numbers
 
 We can also work modulo `N` with Gaussian integers (numbers of the form `a+b*im` where `a`
 and `b` are integers).
@@ -376,7 +376,7 @@ proceeds.
 Bad things happen if the denominator and the modulus are not
 relatively prime.
 
-## Other Packages Using `Mod`s
+## Other Packages Using Mods
 
 The `Mod` and `GaussMod` types work well with my
 [SimplePolynomials](https://github.com/scheinerman/SimplePolynomials.jl) and [LinearAlgebraX](https://github.com/scheinerman/LinearAlgebraX.jl) modules.
@@ -409,3 +409,53 @@ julia> ans * A
 julia> char_poly(A)
 Mod{13}(11 + 2im) + Mod{13}(2 + 1im)*x + Mod{13}(10 + 0im)*x^2 + Mod{13}(1 + 0im)*x^3
 ```
+
+
+## Warning about Moduli types: Only use `Int`
+
+We envision that the moduli used in this package will be standard Julia integers of type `Int`. It is possible, but not recommended, to use 
+different `Integer` types (but not `BigInt` because of limitations 
+in parameterized Julia types).
+
+One would expect that equal `Mod` numbers to be identical, and this is true to an extent:
+```
+julia> a = Mod{17}(-1)
+Mod{17}(16)
+
+julia> b = Mod{17}(16)
+Mod{17}(16)
+
+julia> a==b
+true
+
+julia> a===b
+true
+```
+
+However, if the two moduli are equal as integers, but different Julia types,
+trouble may ensue.
+```
+julia> a = Mod{17}(-1)
+Mod{17}(16)
+
+julia> b = Mod{Int16(17)}(-1)
+Mod{17}(16)
+
+julia> a==b
+true
+
+julia> a===b   # false because moduli are different integer types
+false
+
+julia> a+b     # cannot be added because moduli are different integer types
+ERROR: can not promote types `Mod{17,Int64}`` and `Mod{17,Int16}`
+```
+
+If one wishes to use a modulus larger than `typemax(Int)` 
+(which equals `2^63-1`) then the modulus may be an `Int128` number.
+However, arithmetic operations are likely to give incorrect results.
+
+A future release of this `Mods` package may only allow `Int` moduli. 
+
+
+
