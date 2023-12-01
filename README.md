@@ -455,7 +455,7 @@ If one wishes to use a modulus larger than `typemax(Int)`
 (which equals `2^63-1`) then the modulus may be an `Int128` number.
 However, arithmetic operations are likely to give incorrect results.
 
-A future release of this `Mods` package may only allow `Int` moduli. 
+A future release of this `Mods` package will likely only allow `Int` moduli. 
 
 
 
