@@ -10,7 +10,7 @@ export CRT
 abstract type AbstractMod <: Number end
 
 """
-`Mod{m}(v)` creates a modular number in mod `m` with value `mod(v,m)`.
+`Mod{N}(v)` creates a modular number in mod `N` with value `mod(v,N)`.
 """
 struct Mod{N,T} <: AbstractMod
     val::T
@@ -19,16 +19,15 @@ end
 # safe constructors (slower)
 function Mod{N}(x::T) where {T<:Integer,N}
     @assert N isa Integer && N > 1 "modulus must be an integer and at least 2"
-    S = typeof(N)
-    v = mod(x, N)
-    Mod{N,S}(v)
+    v = Int(mod(x, N))
+    Mod{Int(N),Int}(v)
 end
 
 function Mod{N}(x::T) where {T<:Complex{<:Integer},N}
     @assert N isa Integer && N > 1 "modulus must be an integer and at least 2"
     S = Complex{typeof(N)}
     v = mod(x, N)
-    Mod{N,S}(v)
+    Mod{Int(N),S}(v)
 end
 
 
