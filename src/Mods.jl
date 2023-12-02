@@ -81,37 +81,33 @@ isapprox(x::Mod{N}, y::Mod{N}; kwargs...) where {N} =
     isapprox(value(x), value(y); kwargs...) || isapprox(value(y), value(x); kwargs...)
 
 # Easy arithmetic
-@inline function +(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
+@inline function +(x::Mod{N}, y::Mod{N}) where {N}
     s, flag = Base.add_with_overflow(x.val, y.val)
     if !flag
-        return Mod{N,T}(s)
+        return Mod{N}(s)
     end
     t = widen(x.val) + widen(y.val)    # add with added precision
-    return Mod{N,T}(mod(t, N))
+    return Mod{N}(mod(t, N))
 end
 
 
-function -(x::Mod{M,T}) where {M,T<:Signed}
-    if (x.val isa BigInt || x.val == typemin(T))
-        return Mod{M,T}(-mod(x.val, M))
-    else
-        return Mod{M,T}(-x.val)
-    end
+function -(x::Mod{M}) where {M}
+    return Mod{M}(-x.val)
 end
 
-function -(x::Mod{M,T}) where {M,T<:Unsigned}
-    return Mod{M,T}(M - value(x))
-end
+# function -(x::Mod{M,T}) where {M,T<:Unsigned}
+#     return Mod{M,T}(M - value(x))
+# end
 
 -(x::Mod, y::Mod) = x + (-y)
 
-@inline function *(x::Mod{N,T}, y::Mod{N,T}) where {N,T}
+@inline function *(x::Mod{N}, y::Mod{N}) where {N}
     p, flag = Base.mul_with_overflow(x.val, y.val)
     if !flag
-        return Mod{N,T}(p)
+        return Mod{N}(p)
     else
         q = widemul(x.val, y.val)         # multipy with added precision
-        return Mod{N,T}(mod(q, N)) # return with proper type
+        return Mod{N}(q) # return with proper type
     end
 end
 
@@ -127,8 +123,8 @@ end
 """
 `inv(x::Mod)` gives the multiplicative inverse of `x`.
 """
-@inline function inv(x::Mod{M,T}) where {M,T}
-    Mod{M,T}(_invmod(x.val, M))
+@inline function inv(x::Mod{M}) where {M}
+    Mod{M}(_invmod(x.val, M))
 end
 _invmod(x::Unsigned, m::Unsigned) = invmod(x, m)
 # faster version of `Base.invmod`, only works for for signed types
@@ -162,9 +158,8 @@ Mod{N}(k::Rational) where {N} = Mod{N}(numerator(k)) / Mod{N}(denominator(k))
 Mod{N,T}(k::Rational{T2}) where {N,T,T2} = Mod{N,T}(numerator(k)) / Mod{N,T}(denominator(k))
 
 # Random
-rand(::Type{Mod{N}}, args::Integer...) where {N} = rand(Mod{N,Int}, args...)
-rand(::Type{Mod{N,T}}) where {N,T} = Mod{N}(rand(T))
-rand(::Type{Mod{N,T}}, dims::Integer...) where {N,T} = Mod{N}.(rand(T, dims...))
+rand(::Type{Mod{N}}, args::Integer...) where {N} = Mod{N}(rand(Int))
+rand(::Type{Mod{N}}, dims::Integer...) where {N} = Mod{N}.(rand(Int, dims...))
 
 # Chinese remainder theorem functions
 """
