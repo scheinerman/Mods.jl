@@ -4,6 +4,8 @@ Modular arithmetic for Julia.
 
 ## New in Version 2
 
+> WARNING: Some bugs still with this version 2.0.0. SORRY!! Working on 'em
+
 With this new version the modulus of a `Mod` number must be of type `Int`.
 If a `Mod` number is constructed with any other typeof `Integer`, the 
 constructor will (try to) convert it to type `Int`.
