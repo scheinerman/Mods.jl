@@ -230,9 +230,21 @@ end
 @testset "isapprox" begin
     @test Mod{7}(3) ≈ Mod{7}(3)
     @test Mod{7}(3) ≈ Mod{7}(10)
-    @test Mod{7}(3) ≈ Mod{7}(10) atol=1
-    @test Mod{7}(3) ≈ Mod{7}(11) atol=1
-    @test !isapprox(Mod{7}(3), Mod{7}(11), atol=0)
+    @test Mod{7}(3) ≈ Mod{7}(10) atol = 1
+    @test Mod{7}(3) ≈ Mod{7}(11) atol = 1
+    @test !isapprox(Mod{7}(3), Mod{7}(11), atol = 0)
     @test !(Mod{7}(3) ≈ Mod{7}(11))
-    @test Mod{7}(3) ≈ Mod{7}(11) atol=2
+    @test Mod{7}(3) ≈ Mod{7}(11) atol = 2
+end
+
+
+@testset "Moduli types" begin
+    a = Mod{17}(-1)
+    b = Mod{17}(16)
+    c = Mod{Int128(17)}(-1)
+    d = Mod{0x11}(-1)
+    @test a == b == c == d
+    @test a === b === c === d
+    @test typeof(value(d)) == Int
+    @test typeof(modulus(c)) == Int
 end
