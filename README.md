@@ -4,7 +4,7 @@ Modular arithmetic for Julia.
 
 ## New in Version 2
 
-> WARNING: Some bugs still with this version 2.0.0. SORRY!! Working on 'em
+> WARNING: Some problems still with versions 2.0.x. SORRY!! Working on 'em. This release removes support for `GaussMod` and other ancillary functions. I plan to reimplement `GaussMod`.
 
 With this new version the modulus of a `Mod` number must be of type `Int`.
 If a `Mod` number is constructed with any other typeof `Integer`, the 
@@ -19,6 +19,8 @@ resolved by requiring `N` to be of type `Int`.
 
 * The internal storage of the value of the `Mod` numbers could be  different. For example, `Mod{17}(-1)` would store the
 value internally as `-1` whereas `Mod{17}(16)` would store the value as `16`.
+
+* Rational values as arguments to `Mod` is currently not supported. So `Mod{17}(2//3)` is, for now, not permitted. Use `Mod{17}(2)/3` instead.
 
 * Finally, if the modulus were a large `Int128` number, then arithmetic 
 operations could silently fail. 
