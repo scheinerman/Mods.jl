@@ -89,6 +89,7 @@ iszero(x::Mod{N}) where {N} = iszero(x.val)
 show(io::IO, z::Mod{N}) where {N} = print(io, "Mod{$N}($(value(z)))")
 show(io::IO, ::MIME"text/plain", z::Mod{N}) where {N} = show(io, z)
 
+include("GaussMods.jl")
 include("mod_arithmetic.jl")
 include("iterate.jl")
 
