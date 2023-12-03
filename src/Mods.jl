@@ -8,6 +8,7 @@ export is_invertible
 export CRT
 
 abstract type AbstractMod <: Number end
+__init__() = @warn "This version of Mods is a bit buggy. Don't upgrade to version 2.0.x yet. I'm working on it."
 
 """
 `Mod{N}(v)` creates a modular number in mod `N` with value `mod(v,N)`.
@@ -71,7 +72,7 @@ end
 
 # Test for equality
 iszero(x::Mod{N}) where {N} = iszero(x.val)
-==(x::Mod, y::Mod) = modulus(x) == modulus(y) && value(y) == value(y)
+==(x::Mod, y::Mod) = modulus(x) == modulus(y) && value(x) == value(y)
 # ==(x::Mod{N}, y::Mod{N}) where {N} = iszero(value(x - y))
 
 # Apporximate equality
