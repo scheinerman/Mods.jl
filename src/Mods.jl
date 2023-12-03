@@ -12,9 +12,9 @@ import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show, iszero, iso
 export Mod, modulus, value, AbstractMod
 export is_invertible
 
-QZ = Union{Rational,Integer}
-CZ = Union{Complex,Integer}
-CZQ = Union{Complex{Integer},Integer,Complex{Rational},Rational}
+QZ = Union{<:Rational,<:Integer}
+CZ = Union{Complex,<:Integer}
+CZQ = Union{Complex{<:Integer},Integer,Complex{<:Rational},Rational}
 
 
 abstract type AbstractMod <: Number end
@@ -40,7 +40,7 @@ function Mod{N}(x::Integer) where {N}
     Mod{Int(N),Int}(v)
 end
 
-function Mod{N}(x::Rational) where N
+function Mod{N}(x::Rational) where {N}
     a = numerator(x)
     b = denominator(x)
     return Mod{N}(a) / Mod{N}(b)

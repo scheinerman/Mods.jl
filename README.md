@@ -4,9 +4,12 @@ Modular arithmetic for Julia.
 
 ## New in Version 2
 
-> **WARNING**: Some problems still with versions 2.0.x. SORRY!! Working on 'em. This release removes support for `GaussMod` and other ancillary functions. I plan to reimplement `GaussMod`.
+> **WARNING**: Some problems still with versions 2.0.x. SORRY!! Working on 'em. 
 
 > **NOTE**: Version 2.0.2 seems to have most bugs squashed. No `GaussMod` values yet though.
+
+> **NOTE**: Version 2.0.3 re-implements `GaussMod` but not confident on bug checks. 
+
 
 With this new version the modulus of a `Mod` number must be of type `Int`.
 If a `Mod` number is constructed with any other typeof `Integer`, the 

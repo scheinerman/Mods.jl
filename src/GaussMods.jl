@@ -32,6 +32,11 @@ GaussMod{N}(x::Integer, y::Integer) where {N} = GaussMod{N}(x + im * y)
 
 GaussMod{N}(x::Rational) where {N} = GaussMod{N}(Mod{N}(x))
 
+function GaussMod{N}(x::Complex{Rational{T}}) where {N,T}
+    a = Mod{N}(real(x))
+    b = Mod{N}(imag(x))
+    return GaussMod{N}(value(a), value(b))
+end
 
 
 function Mod{N}(x::Complex) where {N}

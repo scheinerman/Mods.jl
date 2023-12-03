@@ -1,5 +1,3 @@
-QZ = Union{Rational,Integer}
-
 @inline function (+)(x::Mod{N}, y::Mod{N}) where {N}
     t = widen(x.val) + widen(y.val)    # add with added precision
     return Mod{N}(mod(t, N))
