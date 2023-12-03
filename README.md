@@ -22,8 +22,6 @@ resolved by requiring `N` to be of type `Int`.
 * The internal storage of the value of the `Mod` numbers could be  different. For example, `Mod{17}(-1)` would store the
 value internally as `-1` whereas `Mod{17}(16)` would store the value as `16`.
 
-* Rational values as arguments to `Mod` is currently not supported. So `Mod{17}(2//3)` is, for now, not permitted. Use `Mod{17}(2)/3` instead.
-
 * Finally, if the modulus were a large `Int128` number, then arithmetic 
 operations could silently fail. 
 
@@ -31,7 +29,8 @@ We believe that the dominant use case for this module will be with moduli betwee
 users. Further, since `Mod` numbers that required `Int128` moduli were 
 likely to give incorrect results, version 1 of this module was buggy.
 
-
+In addition, some functionality has been moved to the `extras` folder. 
+See the `README` there. 
 
 
 ## Quick Overview
@@ -365,28 +364,6 @@ julia> rand(Mod{10},2,5)
  Mod{10}(1)  Mod{10}(1)  Mod{10}(8)  Mod{10}(4)  Mod{10}(0)
  ```
 
-
-### Chinese remainder theorem
-
-The Chinese Remainder Theorem gives a solution to the following
-problem. Given integers `a, b, m, n` with `gcd(m,n)==1` find an
-integer `x` such that `mod(x,m)==mod(a,m)` and
-`mod(x,n)==mod(b,n)`. We provide the `CRT` function to solve this
-problem as illustrated here with `a=3`, `m=10`, `b=5`, and `n=17`:
-
-```
-julia> s = Mod{10}(3); t = Mod{17}(5);
-
-julia> CRT(s,t)
-73
-```
-
-We find that `mod(73,10)` equals `3` and `mod(73,17)` equals `5` as
-required. The answer is reported as `73` because any value of
-`x` congruent to 73 modulo 170 is a solution.
-
-The `CRT` function can be applied to any number of arguments so long
-as their moduli are pairwise relatively prime.
 
 
 

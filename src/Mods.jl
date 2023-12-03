@@ -12,6 +12,9 @@ import Base: rand, iszero
 export Mod, modulus, value, AbstractMod
 export is_invertible
 
+QZ = Union{Rational,Integer}
+
+
 abstract type AbstractMod <: Number end
 
 # Private constructor DO NOT USE
@@ -35,6 +38,11 @@ function Mod{N}(x::Integer) where {N}
     Mod{Int(N),Int}(v)
 end
 
+function Mod{N}(x::Rational) where N
+    a = numerator(x)
+    b = denominator(x)
+    return Mod{N}(a) / Mod{N}(b)
+end
 
 
 """
@@ -72,8 +80,8 @@ end
 # Test for equality
 iszero(x::Mod{N}) where {N} = iszero(x.val)
 (==)(x::Mod, y::Mod) = modulus(x) == modulus(y) && value(x) == value(y)
-(==)(x::Mod{N}, y::T) where {N,T<:Integer} = x == Mod{N}(y)
-(==)(x::T, y::Mod{N}) where {N,T<:Integer} = Mod{N}(x) == y
+(==)(x::Mod{N}, y::T) where {N,T<:QZ} = x == Mod{N}(y)
+(==)(x::T, y::Mod{N}) where {N,T<:QZ} = Mod{N}(x) == y
 
 
 

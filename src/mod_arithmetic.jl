@@ -1,10 +1,12 @@
+QZ = Union{Rational,Integer}
+
 @inline function (+)(x::Mod{N}, y::Mod{N}) where {N}
     t = widen(x.val) + widen(y.val)    # add with added precision
     return Mod{N}(mod(t, N))
 end
 
-(+)(x::Mod{N}, y::T) where {N,T<:Integer} = x + Mod{N}(y)
-(+)(y::T, x::Mod{N}) where {N,T<:Integer} = x + y
+(+)(x::Mod{N}, y::T) where {N,T<:QZ} = x + Mod{N}(y)
+(+)(y::T, x::Mod{N}) where {N,T<:QZ} = x + y
 
 
 @inline function (-)(x::Mod{M}) where {M}
@@ -12,16 +14,16 @@ end
 end
 
 @inline (-)(x::Mod, y::Mod) = x + (-y)
-(-)(x::Mod, y::T) where {T<:Integer} = x + (-y)
-(-)(x::T, y::Mod) where {T<:Integer} = x + (-y)
+(-)(x::Mod, y::T) where {T<:QZ} = x + (-y)
+(-)(x::T, y::Mod) where {T<:QZ} = x + (-y)
 
 @inline function *(x::Mod{N}, y::Mod{N}) where {N}
     q = widemul(x.val, y.val)         # multipy with added precision
     return Mod{N}(q) # return with proper type
 end
 
-(*)(x::Mod{N}, y::T) where {N,T<:Integer} = x * Mod{N}(y)
-(*)(x::T, y::Mod{N}) where {N,T<:Integer} = y * x
+(*)(x::Mod{N}, y::T) where {N,T<:QZ} = x * Mod{N}(y)
+(*)(x::T, y::Mod{N}) where {N,T<:QZ} = y * x
 
 # Division stuff
 """
@@ -51,13 +53,13 @@ function (/)(x::Mod{N}, y::Mod{N}) where {N}
     return x * inv(y)
 end
 
-(/)(x::Mod{N}, y::T) where {N, T<:Integer} = x / Mod{N}(y)
-(/)(x::T, y::Mod{N}) where {N, T<:Integer} = Mod{N}(x) /  y
+(/)(x::Mod{N}, y::T) where {N,T<:QZ} = x / Mod{N}(y)
+(/)(x::T, y::Mod{N}) where {N,T<:QZ} = Mod{N}(x) / y
 
 (//)(x::Mod{N}, y::Mod{N}) where {N} = x / y
-(//)(x::T, y::Mod{N}) where {N,T<:Integer} = x / y
-(//)(x::Mod{N}, y::T) where {N,T<:Integer} = x / y
+(//)(x::T, y::Mod{N}) where {N,T<:QZ} = x / y
+(//)(x::Mod{N}, y::T) where {N,T<:QZ} = x / y
 
 # Random
-rand(::Type{Mod{N}}, dims::Integer...) where {N} = Mod{N}.(rand(Int, dims...))
+rand(::Type{Mod{N}}, dims::QZ...) where {N} = Mod{N}.(rand(Int, dims...))
 
