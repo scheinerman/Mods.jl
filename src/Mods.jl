@@ -6,8 +6,8 @@ __init__() =
 
 
 
-import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show
-import Base: rand, iszero
+import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show, iszero
+
 
 export Mod, modulus, value, AbstractMod
 export is_invertible

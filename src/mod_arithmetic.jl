@@ -60,6 +60,7 @@ end
 (//)(x::T, y::Mod{N}) where {N,T<:QZ} = x / y
 (//)(x::Mod{N}, y::T) where {N,T<:QZ} = x / y
 
-# Random
-rand(::Type{Mod{N}}, dims::QZ...) where {N} = Mod{N}.(rand(Int, dims...))
+
+import Base: rand
+rand(::Type{Mod{N}}, dims::Integer...) where {N} = Mod{N}.(rand(Int, dims...))
 
