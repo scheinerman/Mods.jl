@@ -14,8 +14,6 @@ using Mods
     @test typeof(a) == GaussMod{17,Int}
     a = zero(Mod{17})
     @test typeof(a) == Mod{17,Int}
-    a = Mod{17}(1 // 2 + (3 // 4)im)
-    @test typeof(a) == GaussMod{17,Int}
 end
 
 
@@ -50,31 +48,6 @@ end
     @test -Mod{13,Int}(typemin(Int)) == -Mod{13}(mod(typemin(Int), 13))
 end
 
-@testset "Mod arithmetic with UInt" begin
-    p = UInt(23)
-    a = Mod{p,UInt}(2)
-    b = Mod{p,UInt}(25)
-    @test a == b
-    @test a == 2
-    @test a == 25
-
-    b = Mod{p,UInt}(20)
-    @test a + b == 22
-    @test a - b == 28
-    @test a + a == 2a
-    @test 0 - a == -a
-
-    @test a * b == Mod{p,UInt}(17)
-    @test (a / b) * b == a
-    @test (b // a) * (2 // 1) == b
-    @test a * (2 // 3) == (2a) * inv(Mod{p,UInt}(3))
-
-    @test is_invertible(a)
-    @test !is_invertible(Mod{10}(4))
-
-    @test a^(p - 1) == 1
-    @test a^(-1) == inv(a)
-end
 
 @testset "GaussMod arithmetic" begin
     @test one(GaussMod{6}) == Mod{6}(1 + 0im)

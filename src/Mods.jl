@@ -82,16 +82,12 @@ isapprox(x::Mod{N}, y::Mod{N}; kwargs...) where {N} =
 
 # Easy arithmetic
 @inline function +(x::Mod{N}, y::Mod{N}) where {N}
-    s, flag = Base.add_with_overflow(x.val, y.val)
-    if !flag
-        return Mod{N}(s)
-    end
     t = widen(x.val) + widen(y.val)    # add with added precision
     return Mod{N}(mod(t, N))
 end
 
 
-function -(x::Mod{M}) where {M}
+@inline function -(x::Mod{M}) where {M}
     return Mod{M}(-x.val)
 end
 
@@ -99,23 +95,18 @@ end
 #     return Mod{M,T}(M - value(x))
 # end
 
--(x::Mod, y::Mod) = x + (-y)
+@inline -(x::Mod, y::Mod) = x + (-y)
 
 @inline function *(x::Mod{N}, y::Mod{N}) where {N}
-    p, flag = Base.mul_with_overflow(x.val, y.val)
-    if !flag
-        return Mod{N}(p)
-    else
-        q = widemul(x.val, y.val)         # multipy with added precision
-        return Mod{N}(q) # return with proper type
-    end
+    q = widemul(x.val, y.val)         # multipy with added precision
+    return Mod{N}(q) # return with proper type
 end
 
 # Division stuff
 """
 `is_invertible(x::Mod)` determines if `x` is invertible.
 """
-function is_invertible(x::Mod{M})::Bool where {M}
+@inline function is_invertible(x::Mod{M})::Bool where {M}
     return gcd(x.val, M) == 1
 end
 
@@ -158,7 +149,7 @@ Mod{N}(k::Rational) where {N} = Mod{N}(numerator(k)) / Mod{N}(denominator(k))
 Mod{N,T}(k::Rational{T2}) where {N,T,T2} = Mod{N,T}(numerator(k)) / Mod{N,T}(denominator(k))
 
 # Random
-rand(::Type{Mod{N}}, args::Integer...) where {N} = Mod{N}(rand(Int))
+# rand(::Type{Mod{N}}, args::Integer...) where {N} = Mod{N}(rand(Int))
 rand(::Type{Mod{N}}, dims::Integer...) where {N} = Mod{N}.(rand(Int, dims...))
 
 # Chinese remainder theorem functions

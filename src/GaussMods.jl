@@ -50,4 +50,6 @@ function inv(x::GaussMod{N}) where {N}
 end
 
 is_invertible(x::GaussMod) = is_invertible(real(x * x'))
-rand(::Type{GaussMod{N}}, args::Integer...) where {N} = rand(GaussMod{N,Int}, args...)
+#rand(::Type{GaussMod{N}}, args::Integer...) where {N} = rand(GaussMod{N,Int}, args...)
+
+rand(::Type{GaussMod{N}}, args::Integer...) where {N} = rand(Mod{N}, args...) .+ im*rand(Mod{N}, args...)
