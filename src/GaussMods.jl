@@ -2,8 +2,8 @@ import Base: real, imag, reim, conj
 
 export GaussMod
 
-CZ = Union{Complex,Integer}
-CZQ = Union{Complex{Integer},Integer,Complex{Rational},Rational}
+# CZ = Union{Complex,Integer}
+# CZQ = Union{Complex{Integer},Integer,Complex{Rational},Rational}
 
 
 struct GaussMod{N,T} <: AbstractMod
@@ -41,4 +41,4 @@ modulus(x::GaussMod{N}) where N = N
 
 
 show(io::IO, z::GaussMod{N}) where {N} = print(io, "GaussMod{$N}($(value(z)))")
-show(io::IO, ::MIME"text/plain", z::Mod{N}) where {N} = show(io, z)
+show(io::IO, ::MIME"text/plain", z::GaussMod{N}) where {N} = show(io, z)

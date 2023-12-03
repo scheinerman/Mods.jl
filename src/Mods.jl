@@ -6,7 +6,7 @@ __init__() =
 
 
 
-import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show, iszero
+import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show, iszero, mod
 
 
 export Mod, modulus, value, AbstractMod
