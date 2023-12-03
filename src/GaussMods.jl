@@ -2,9 +2,6 @@ import Base: real, imag, reim, conj
 
 export GaussMod
 
-# CZ = Union{Complex,Integer}
-# CZQ = Union{Complex{Integer},Integer,Complex{Rational},Rational}
-
 
 struct GaussMod{N,T} <: AbstractMod
     val::T
@@ -13,7 +10,7 @@ end
 # type casting
 GaussMod{N,T}(x::Mod{N,T2}) where {T,N,T2} = GaussMod{N,T}(T(x.val))
 GaussMod{N,T}(x::Mod{N,T}) where {T,N} = x
-
+GaussMod(x::AbstractMod) = GaussMod{modulus(x)}(value(x))
 
 
 mod(z::Complex{<:Integer}, n::Integer) = Complex(mod(real(z), n), mod(imag(z), n))
@@ -29,7 +26,12 @@ function GaussMod{N}(x::Union{Complex,Integer}) where {N}
     GaussMod{Int(N),Complex{Int}}(v)
 end
 
+GaussMod{N}(x::Mod{N}) where {N} = GaussMod{N}(value(x), 0)
+
 GaussMod{N}(x::Integer, y::Integer) where {N} = GaussMod{N}(x + im * y)
+
+GaussMod{N}(x::Rational) where {N} = GaussMod{N}(Mod{N}(x))
+
 
 
 function Mod{N}(x::Complex) where {N}
@@ -37,7 +39,9 @@ function Mod{N}(x::Complex) where {N}
 end
 
 value(x::GaussMod) = x.val
-modulus(x::GaussMod{N}) where N = N
+modulus(x::GaussMod{N}) where {N} = N
+
+
 
 
 show(io::IO, z::GaussMod{N}) where {N} = print(io, "GaussMod{$N}($(value(z)))")

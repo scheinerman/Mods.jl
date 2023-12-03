@@ -6,13 +6,15 @@ __init__() =
 
 
 
-import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show, iszero, mod
+import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show, iszero, isone, mod
 
 
 export Mod, modulus, value, AbstractMod
 export is_invertible
 
 QZ = Union{Rational,Integer}
+CZ = Union{Complex,Integer}
+CZQ = Union{Complex{Integer},Integer,Complex{Rational},Rational}
 
 
 abstract type AbstractMod <: Number end
@@ -46,9 +48,9 @@ end
 
 
 """
-`modulus(a::Mad)` returns the modulus of this `Mad` number.
+`modulus(a::Mod)` returns the modulus of this `Mod` number.
 ```
-julia> a = Mad{13}(11);
+julia> a = Mod{13}(11);
 
 julia> modulus(a)
 13
@@ -57,9 +59,9 @@ julia> modulus(a)
 modulus(a::Mod{N}) where {N} = N
 
 """
-`value(a::Mad)` returns the value of this `Mad` number.
+`value(a::Mod)` returns the value of this `Mod` number.
 ```
-julia> a = Mad{13}(11);
+julia> a = Mod{13}(11);
 
 julia> value(a)
 11
@@ -77,11 +79,15 @@ function hash(x::Mod, h::UInt64 = UInt64(0))
     return hash(v, hash(m, h))
 end
 
+
+
 # Test for equality
-iszero(x::Mod{N}) where {N} = iszero(x.val)
-(==)(x::Mod, y::Mod) = modulus(x) == modulus(y) && value(x) == value(y)
-(==)(x::Mod{N}, y::T) where {N,T<:QZ} = x == Mod{N}(y)
-(==)(x::T, y::Mod{N}) where {N,T<:QZ} = Mod{N}(x) == y
+iszero(x::AbstractMod) = iszero(x.val)
+isone(x::AbstractMod) = isone(x.val)
+(==)(x::AbstractMod, y::AbstractMod) = modulus(x) == modulus(y) && value(x) == value(y)
+(==)(x::AbstractMod, y::T) where {T<:CZQ} = x == Mod{modulus(x)}(y)
+(==)(x::T, y::AbstractMod) where {T<:CZQ} = Mod{modulus(x)}(x) == y
+
 
 
 
@@ -91,6 +97,7 @@ show(io::IO, ::MIME"text/plain", z::Mod{N}) where {N} = show(io, z)
 
 include("GaussMods.jl")
 include("mod_arithmetic.jl")
+include("gauss_mod_arithmetic.jl")
 include("iterate.jl")
 
 end # module Mods
