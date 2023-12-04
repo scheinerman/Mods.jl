@@ -27,9 +27,11 @@ function GaussMod{N}(x::Union{Complex,Integer}) where {N}
 end
 
 GaussMod{N}(x::Mod{N}) where {N} = GaussMod{N}(value(x), 0)
-
+GaussMod(x::GaussMod) = x
+Mod(x::GaussMod) = x
+Mod{N}(x::GaussMod{N}) where {N} = x
+GaussMod{N, T}(x::GaussMod{N, T}) where {N, T} = x
 GaussMod{N}(x::Integer, y::Integer) where {N} = GaussMod{N}(x + im * y)
-
 GaussMod{N}(x::Rational) where {N} = GaussMod{N}(Mod{N}(x))
 
 function GaussMod{N}(x::Complex{Rational{T}}) where {N,T}
@@ -45,8 +47,7 @@ end
 
 value(x::GaussMod) = x.val
 modulus(x::GaussMod{N}) where {N} = N
-
-
+abs(x::GaussMod) = abs(value(x))
 
 
 show(io::IO, z::GaussMod{N}) where {N} = print(io, "GaussMod{$N}($(value(z)))")

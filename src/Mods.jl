@@ -6,7 +6,8 @@ __init__() =
 
 
 
-import Base: (==), (+), (-), (*), (inv), (/), (//), (^), hash, show, iszero, isone, mod
+import Base: (==), (+), (-), (*), (inv), (/), (//), (^)
+import Base: hash, show, iszero, isone, mod, abs,conj
 
 
 export Mod, modulus, value, AbstractMod
@@ -69,8 +70,8 @@ julia> value(a)
 """
 value(a::Mod{N}) where {N} = a.val
 
-Base.abs(a::Mod{N} where {N}) = abs(value(a))
-Base.conj(x::Mod{N}) where {N} = Mod{N}(conj(x.val))
+abs(a::Mod{N} where {N}) = abs(value(a))
+conj(x::Mod{N}) where {N} = Mod{N}(conj(x.val))
 
 
 function hash(x::Mod, h::UInt64 = UInt64(0))
