@@ -1,10 +1,6 @@
 module Mods
 
 
-__init__() =
-    @warn "This version of Mods is still under development. Don't upgrade to version 2.0.x yet. I'm working on it."
-
-
 
 import Base: (==), (+), (-), (*), (inv), (/), (//), (^)
 import Base: hash, show, iszero, isone, mod, abs,conj

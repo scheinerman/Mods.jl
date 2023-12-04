@@ -6,7 +6,12 @@ using Mods
     @test oneunit(Mod{17}) == Mod{17}(1)
     @test zero(Mod{17}) == 0
     @test iszero(zero(Mod{17}))
-
+    @test one(GaussMod{17}) == 1
+    @test one(GaussMod{17}) == one(Mod{17})
+    @test value(GaussMod{17}(1,2)) == 1 + 2im
+    @test Mod(Mod{17}(1)) == one(Mod{17})
+    @test GaussMod(GaussMod{17}(2,3)) == 2 + 3im
+    @test Mod(GaussMod{17}(2,3)) == 2 + 3im
 end
 
 
@@ -26,7 +31,7 @@ end
 
     @test a * b == Mod{p}(17)
     @test (a / b) * b == a
-    # @test (b // a) * (2 // 1) == b
+    @test (b // a) * (2 // 1) == b
     @test (a * 2) // 3 == (2a) * inv(Mod{p}(3))
 
     @test is_invertible(a)
@@ -35,36 +40,37 @@ end
     @test a^(p - 1) == 1
     @test a^(-1) == inv(a)
 
-    # @test -Mod{13,Int}(typemin(Int)) == -Mod{13}(mod(typemin(Int), 13))
+    @test -Mod{13}(typemin(Int)) == -Mod{13}(mod(typemin(Int), 13))
+    @test Mod{13}(typemax(Int)) == typemax(Int) % 13
 end
 
 
-# @testset "GaussMod arithmetic" begin
-#     @test one(GaussMod{6}) == Mod{6}(1 + 0im)
-#     @test zero(GaussMod{6}) == Mod{6}(0 + 0im)
-#     @test GaussMod{6}(2 + 3im) == Mod{6}(2 + 3im)
-#     @test GaussMod{6,Int}(2 + 3im) == Mod{6}(2 + 3im)
-#     @test rand(GaussMod{6}) isa GaussMod
-#     @test eltype(rand(GaussMod{6}, 4, 4)) <: GaussMod
-#     p = 23
-#     a = GaussMod{p}(3 - im)
-#     b = Mod{p}(5 + 5im)
+@testset "GaussMod arithmetic" begin
+    @test one(GaussMod{6}) == Mod{6}(1 + 0im)
+    @test zero(GaussMod{6}) == Mod{6}(0 + 0im)
+    @test GaussMod{6}(2 + 3im) == Mod{6}(2 + 3im)
+    @test GaussMod{6}(2 + 3im) == Mod{6}(2 + 3im)
+    @test rand(GaussMod{6}) isa GaussMod
+    @test eltype(rand(GaussMod{6}, 4, 4)) <: GaussMod
+    p = 23
+    a = GaussMod{p}(3 - im)
+    b = Mod{p}(5 + 5im)
 
-#     @test a + b == 8 + 4im
-#     @test a + Mod{p}(11) == Mod{p}(14, 22)
-#     @test -a == 20 + im
-#     @test a - b == Mod{p}(3 - im - 5 - 5im)
+    @test a + b == 8 + 4im
+    @test a + Mod{p}(11) == GaussMod{p}(14, 22)
+    @test -a == 20 + im
+    @test a - b == Mod{p}(3 - im - 5 - 5im)
 
-#     @test a * b == Mod{p}((3 - im) * (5 + 5im))
-#     @test a / b == Mod{p}((3 - im) // (5 + 5im))
+    @test a * b == Mod{p}((3 - im) * (5 + 5im))
+    @test a / b == Mod{p}((3 - im) // (5 + 5im))
 
-#     @test a^(p * p - 1) == 1
-#     @test is_invertible(a)
-#     @test a * inv(a) == 1
+    @test a^(p * p - 1) == 1
+    @test is_invertible(a)
+    @test a * inv(a) == 1
 
-#     @test a / (1 + im) == a / Mod{p}(1 + im)
-#     @test imag(a * a') == 0
-# end
+    @test a / (1 + im) == a / Mod{p}(1 + im)
+    @test imag(a * a') == 0
+end
 
 @testset "Large Modulus" begin
 
@@ -94,33 +100,6 @@ end
 
 
 
-# @testset "CRT" begin
-#     p = 23
-#     q = 91
-#     a = Mod{p}(17)
-#     b = Mod{q}(32)
-
-#     @test CRT(Int32, [], []) === Int32(0)
-#     x = CRT(a, b)
-#     @test typeof(x) <: BigInt
-#     @test a == mod(x, p)
-#     @test b == mod(x, q)
-
-#     c = Mod{101}(86)
-#     x = CRT(Int, a, b, c)
-#     @test typeof(x) <: Int
-
-#     @test a == mod(x, p)
-#     @test b == mod(x, q)
-#     @test c == mod(x, 101)
-
-#     @test CRT(
-#         BigInt,
-#         Mod{9223372036854775783}(9223372036854775782),
-#         Mod{9223372036854775643}(9223372036854775642),
-#     ) == 85070591730234614113402964855534653468
-# end
-
 
 @testset "Matrices" begin
     M = zeros(Mod{11}, 3, 3)
@@ -145,17 +124,6 @@ end
     @test prod(k for k in Mod{7} if k != 0) == -1  # Wilson's theorem
 
 end
-
-
-# @testset "isapprox" begin
-#     @test Mod{7}(3) ≈ Mod{7}(3)
-#     @test Mod{7}(3) ≈ Mod{7}(10)
-#     @test Mod{7}(3) ≈ Mod{7}(10) atol = 1
-#     @test Mod{7}(3) ≈ Mod{7}(11) atol = 1
-#     @test !isapprox(Mod{7}(3), Mod{7}(11), atol = 0)
-#     @test !(Mod{7}(3) ≈ Mod{7}(11))
-#     @test Mod{7}(3) ≈ Mod{7}(11) atol = 2
-# end
 
 
 @testset "Moduli types" begin
