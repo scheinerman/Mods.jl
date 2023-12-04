@@ -366,7 +366,7 @@ julia> rand(Mod{10},2,5)
 ### Rationals and Mods
 
 The result of `Mod{N}(a//b)` is exactly
-`Mod{N}(numerator(a)) / Mod{n}(denominator(b))`. This may equal
+`Mod{N}(numerator(a)) / Mod{N}(denominator(b))`. This may equal
 `Mod{N}(a)/Mod{N}(b)` if `a` and `b` are relatively prime to each other
 and to `N`.
 
