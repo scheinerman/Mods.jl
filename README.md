@@ -4,11 +4,6 @@ Modular arithmetic for Julia.
 
 ## New in Version 2
 
-> **WARNING**: Some problems still with versions 2.0.x. SORRY!! Working on 'em. 
-
-> **NOTE**: Version 2.0.2 seems to have most bugs squashed. No `GaussMod` values yet though.
-
-> **NOTE**: Version 2.0.3 re-implements `GaussMod` but not confident on bug checks. 
 
 
 With this new version the modulus of a `Mod` number must be of type `Int`.
@@ -20,15 +15,18 @@ constructor will (try to) convert it to type `Int`.
 There were various issues in the earlier version of `Mods` that are 
 resolved by requiring `N` to be of type `Int`.
 
-* Previously `Mod` numbers created with different sorts of integer parameters would be different. So if `N = 17` and `M = 0x11`, then `Mod{N}(1)` would not be interoperable with `Mod{M}(1).`
+* Previously `Mod` numbers created with different sorts of integer parameters would 
+be different. So if `N = 17` and `M = 0x11`, then `Mod{N}(1)` would not be interoperable with `Mod{M}(1).`
 
-* The internal storage of the value of the `Mod` numbers could be  different. For example, `Mod{17}(-1)` would store the
+* The internal storage of the value of the `Mod` numbers could be  different. 
+For example, `Mod{17}(-1)` would store the
 value internally as `-1` whereas `Mod{17}(16)` would store the value as `16`.
 
 * Finally, if the modulus were a large `Int128` number, then arithmetic 
 operations could silently fail. 
 
-We believe that the dominant use case for this module will be with moduli between `2` and `2^63-1` and so we do not expect this change to affect
+We believe that the dominant use case for this module will be with moduli between 
+`2` and `2^63-1` and so we do not expect this change to affect
 users. Further, since `Mod` numbers that required `Int128` moduli were 
 likely to give incorrect results, version 1 of this module was buggy.
 
@@ -55,22 +53,13 @@ julia> 2a
 Mod{17}(1)
 
 julia> a = Mod{17}(9-2im)
-Mod{17}(9 + 15im)
+GaussMod{17}(9 + 15im)
 
 julia> 2a
-Mod{17}(1 + 13im)
+GaussMod{17}(1 + 13im)
 
 julia> a'
-Mod{17}(9 + 2im)
-
-julia> typeof(a)
-GaussMod{17}
-
-julia> typeof(b)
-Mod{17}
-
-julia> supertype(ans)
-AbstractMod
+GaussMod{17}(9 + 2im)
 ```
 
 ## Basics 
@@ -177,16 +166,16 @@ We can also work modulo `N` with Gaussian integers (numbers of the form `a+b*im`
 and `b` are integers).
 ```
 julia> a = Mod{10}(2-3im)
-Mod{10}(2 + 7im)
+GaussMod{10}(2 + 7im)
 
 julia> b = Mod{10}(5+6im)
-Mod{10}(5 + 6im)
+GaussMod{10}(5 + 6im)
 
 julia> a+b
-Mod{10}(7 + 3im)
+GaussMod{10}(7 + 3im)
 
 julia> a*b
-Mod{10}(8 + 7im)
+GaussMod{10}(8 + 7im)
 ```
 In addition to the usual arithmetic operations, the following features apply 
 to `GaussMod` values.
@@ -195,7 +184,7 @@ to `GaussMod` values.
 * Use the functions `real` and `imag` (or `reim`) to extract the real and imaginary parts:
 ```
 julia> a = Mod{10}(2-3im)
-Mod{10}(2 + 7im)
+GaussMod{10}(2 + 7im)
 
 julia> real(a)
 Mod{10}(2)
@@ -211,16 +200,16 @@ julia> reim(a)
 Use `a'` (or `conj(a)`) to get the complex conjugate value:
 ```
 julia> a = Mod{10}(2-3im)
-Mod{10}(2 + 7im)
+GaussMod{10}(2 + 7im)
 
 julia> a'
-Mod{10}(2 + 3im)
+GaussMod{10}(2 + 3im)
 
 julia> a*a'
-Mod{10}(3 + 0im)
+GaussMod{10}(3 + 0im)
 
 julia> a+a'
-Mod{10}(4 + 0im)
+GaussMod{10}(4 + 0im)
 ```
 
 ### Inspection
@@ -272,19 +261,20 @@ julia> zero(Mod{9})
 Mod{9}(0)
 
 julia> one(GaussMod{7})
-Mod{7}(1 + 0im)
+GaussMod{7}(1 + 0im)
 
 julia> zeros(Mod{9},2,2)
-2×2 Array{Mod{9},2}:
+2×2 Matrix{Mod{9}}:
  Mod{9}(0)  Mod{9}(0)
  Mod{9}(0)  Mod{9}(0)
 
 julia> ones(GaussMod{5},4)
-4-element Array{GaussMod{5},1}:
- Mod{5}(1 + 0im)
- Mod{5}(1 + 0im)
- Mod{5}(1 + 0im)
- Mod{5}(1 + 0im)
+4-element Vector{GaussMod{5}}:
+ GaussMod{5}(1 + 0im)
+ GaussMod{5}(1 + 0im)
+ GaussMod{5}(1 + 0im)
+ GaussMod{5}(1 + 0im)
+
 ```
 
 ### Iteration
@@ -328,15 +318,15 @@ One can also use `GaussMod` as an iterator:
 julia> for z in GaussMod{3}
        println(z)
        end
-Mod{3}(0 + 0im)
-Mod{3}(0 + 1im)
-Mod{3}(0 + 2im)
-Mod{3}(1 + 0im)
-Mod{3}(1 + 1im)
-Mod{3}(1 + 2im)
-Mod{3}(2 + 0im)
-Mod{3}(2 + 1im)
-Mod{3}(2 + 2im)
+GaussMod{3}(0 + 0im)
+GaussMod{3}(0 + 1im)
+GaussMod{3}(0 + 2im)
+GaussMod{3}(1 + 0im)
+GaussMod{3}(1 + 1im)
+GaussMod{3}(1 + 2im)
+GaussMod{3}(2 + 0im)
+GaussMod{3}(2 + 1im)
+GaussMod{3}(2 + 2im)
 ```
 
 
@@ -348,24 +338,24 @@ julia> rand(Mod{17})
 Mod{17}(13)
 
 julia> rand(GaussMod{17})
-Mod{17}(3 + 6im)
+GaussMod{17}(3 + 6im)
 ```
 
 With extra arguments, `rand` produces random vectors or matrices populated with 
 modular numbers:
 ```
 julia> rand(GaussMod{10},4)
-4-element Array{GaussMod{10},1}:
- Mod{10}(6 + 0im)
- Mod{10}(3 + 2im)
- Mod{10}(9 + 9im)
- Mod{10}(2 + 5im)
+4-element Vector{GaussMod{10, Complex{Int64}}}:
+ GaussMod{10}(2 + 6im)
+ GaussMod{10}(2 + 6im)
+ GaussMod{10}(7 + 4im)
+ GaussMod{10}(7 + 3im)
 
 julia> rand(Mod{10},2,5)
-2×5 Array{Mod{10},2}:
- Mod{10}(3)  Mod{10}(1)  Mod{10}(1)  Mod{10}(3)  Mod{10}(0)
- Mod{10}(1)  Mod{10}(1)  Mod{10}(8)  Mod{10}(4)  Mod{10}(0)
- ```
+2×5 Matrix{Mod{10, Int64}}:
+ Mod{10}(9)  Mod{10}(8)  Mod{10}(1)  Mod{10}(3)  Mod{10}(1)
+ Mod{10}(2)  Mod{10}(0)  Mod{10}(9)  Mod{10}(0)  Mod{10}(2)
+```
 
 
 
@@ -397,76 +387,29 @@ The `Mod` and `GaussMod` types work well with my
 julia> using LinearAlgebraX
 
 julia> A = rand(GaussMod{13},3,3)
-3×3 Array{GaussMod{13},2}:
- Mod{13}(11 + 0im)   Mod{13}(0 + 10im)  Mod{13}(1 + 9im)
-  Mod{13}(8 + 4im)  Mod{13}(11 + 10im)  Mod{13}(1 + 8im)
- Mod{13}(11 + 6im)   Mod{13}(10 + 6im)  Mod{13}(7 + 3im)
+3×3 Matrix{GaussMod{13, Complex{Int64}}}:
+ GaussMod{13}(12 + 2im)   GaussMod{13}(3 + 5im)  GaussMod{13}(6 + 11im)
+  GaussMod{13}(0 + 4im)   GaussMod{13}(2 + 1im)  GaussMod{13}(12 + 2im)
+  GaussMod{13}(6 + 0im)  GaussMod{13}(3 + 11im)   GaussMod{13}(4 + 8im)
 
 julia> detx(A)
-Mod{13}(2 + 11im)
+GaussMod{13}(11 + 5im)
 
 julia> invx(A)
-3×3 Array{GaussMod{13},2}:
-  Mod{13}(4 + 6im)   Mod{13}(3 + 3im)    Mod{13}(5 + 1im)
-  Mod{13}(5 + 0im)  Mod{13}(9 + 12im)   Mod{13}(3 + 10im)
- Mod{13}(11 + 6im)   Mod{13}(5 + 1im)  Mod{13}(10 + 12im)
+3×3 Matrix{GaussMod{13, Complex{Int64}}}:
+ GaussMod{13}(12 + 11im)  GaussMod{13}(3 + 6im)  GaussMod{13}(12 + 11im)
+   GaussMod{13}(2 + 7im)  GaussMod{13}(1 + 3im)    GaussMod{13}(9 + 2im)
+   GaussMod{13}(4 + 7im)  GaussMod{13}(8 + 9im)    GaussMod{13}(9 + 1im)
 
 julia> ans * A
-3×3 Array{GaussMod{13},2}:
- Mod{13}(1 + 0im)  Mod{13}(0 + 0im)  Mod{13}(0 + 0im)
- Mod{13}(0 + 0im)  Mod{13}(1 + 0im)  Mod{13}(0 + 0im)
- Mod{13}(0 + 0im)  Mod{13}(0 + 0im)  Mod{13}(1 + 0im)
+3×3 Matrix{GaussMod{13, Complex{Int64}}}:
+ GaussMod{13}(1 + 0im)  GaussMod{13}(0 + 0im)  GaussMod{13}(0 + 0im)
+ GaussMod{13}(0 + 0im)  GaussMod{13}(1 + 0im)  GaussMod{13}(0 + 0im)
+ GaussMod{13}(0 + 0im)  GaussMod{13}(0 + 0im)  GaussMod{13}(1 + 0im)
 
 julia> char_poly(A)
-Mod{13}(11 + 2im) + Mod{13}(2 + 1im)*x + Mod{13}(10 + 0im)*x^2 + Mod{13}(1 + 0im)*x^3
+GaussMod{13}(2 + 8im) + GaussMod{13}(11 + 2im)*x + GaussMod{13}(8 + 2im)*x^2 + GaussMod{13}(1 + 0im)*x^3
 ```
-
-
-## Warning about Moduli types: Only use `Int`
-
-We envision that the moduli used in this package will be standard Julia integers of type `Int`. It is possible, but not recommended, to use 
-different `Integer` types (but not `BigInt` because of limitations 
-in parameterized Julia types).
-
-One would expect that equal `Mod` numbers to be identical, and this is true to an extent:
-```
-julia> a = Mod{17}(-1)
-Mod{17}(16)
-
-julia> b = Mod{17}(16)
-Mod{17}(16)
-
-julia> a==b
-true
-
-julia> a===b
-true
-```
-
-However, if the two moduli are equal as integers, but different Julia types,
-trouble may ensue.
-```
-julia> a = Mod{17}(-1)
-Mod{17}(16)
-
-julia> b = Mod{Int16(17)}(-1)
-Mod{17}(16)
-
-julia> a==b
-true
-
-julia> a===b   # false because moduli are different integer types
-false
-
-julia> a+b     # cannot be added because moduli are different integer types
-ERROR: can not promote types `Mod{17,Int64}`` and `Mod{17,Int16}`
-```
-
-If one wishes to use a modulus larger than `typemax(Int)` 
-(which equals `2^63-1`) then the modulus may be an `Int128` number.
-However, arithmetic operations are likely to give incorrect results.
-
-A future release of this `Mods` package will likely only allow `Int` moduli. 
 
 
 
