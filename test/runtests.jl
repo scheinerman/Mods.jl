@@ -8,10 +8,10 @@ using Mods
     @test iszero(zero(Mod{17}))
     @test one(GaussMod{17}) == 1
     @test one(GaussMod{17}) == one(Mod{17})
-    @test value(GaussMod{17}(1,2)) == 1 + 2im
+    @test value(GaussMod{17}(1, 2)) == 1 + 2im
     @test Mod(Mod{17}(1)) == one(Mod{17})
-    @test GaussMod(GaussMod{17}(2,3)) == 2 + 3im
-    @test Mod(GaussMod{17}(2,3)) == 2 + 3im
+    @test GaussMod(GaussMod{17}(2, 3)) == 2 + 3im
+    @test Mod(GaussMod{17}(2, 3)) == 2 + 3im
 end
 
 
@@ -92,7 +92,7 @@ end
     @test x * p == 0
     @test p - x == x - 2x
 
-    
+
 
     @test 0 <= value(rand(Mod{p})) < p
 
@@ -123,6 +123,8 @@ end
     @test collect(Mod{7}) == Mod{7}.(0:6)
     @test prod(k for k in Mod{7} if k != 0) == -1  # Wilson's theorem
 
+    # complex interation
+    @test sum(GaussMod{7}) == 0
 end
 
 
