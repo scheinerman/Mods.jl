@@ -56,3 +56,8 @@ end
 (//)(x::GaussMod, y::GaussMod) = x/y 
 (//)(x::GaussMod, y::ACZQ) = x/y 
 (//)(x::ACZQ, y::GaussMod) = x/y 
+
+
+function rand(::Type{GaussMod{N}}, dims::Integer...) where {N} 
+    return GaussMod{N}.(rand(Complex{Int}, dims...))
+end
