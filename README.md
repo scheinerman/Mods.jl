@@ -10,6 +10,10 @@ With this new version the modulus of a `Mod` number must be of type `Int`.
 If a `Mod` number is constructed with any other typeof `Integer`, the 
 constructor will (try to) convert it to type `Int`.
 
+> Be sure to construct new `Mod` numbers using this syntax: `Mod{N}(v)`. Do *not* use the 
+old style `Mod{N,T}(v)` (where `T` is an `Integer` type). Support for this old style constructor is going to be
+removed. 
+
 ### Why this change?
 
 There were various issues in the earlier version of `Mods` that are 
