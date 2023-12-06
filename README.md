@@ -159,7 +159,7 @@ julia> b = Mod{9}(1)
 Mod{9}(1)
 
 julia> a+b
-ERROR: can not promote types Mod{10,Int64} and Mod{9,Int64}
+ERROR: Cannot promote types with different moduli
 ```
 
 
@@ -295,7 +295,7 @@ Mod{5}(3)
 Mod{5}(4)
 
 julia> collect(Mod{6})
-6-element Vector{Mod{6, T} where T}:
+6-element Vector{Mod{6}}:
  Mod{6}(0)
  Mod{6}(1)
  Mod{6}(2)
@@ -304,7 +304,7 @@ julia> collect(Mod{6})
  Mod{6}(5)
 
 julia> [k*k for k ∈ Mod{7}]
-7-element Vector{Mod{7, Int64}}:
+7-element Vector{Mod{7}}:
  Mod{7}(0)
  Mod{7}(1)
  Mod{7}(4)
@@ -349,14 +349,14 @@ With extra arguments, `rand` produces random vectors or matrices populated with
 modular numbers:
 ```
 julia> rand(GaussMod{10},4)
-4-element Vector{GaussMod{10, Complex{Int64}}}:
+4-element Vector{GaussMod{10}}:
  GaussMod{10}(2 + 6im)
  GaussMod{10}(2 + 6im)
  GaussMod{10}(7 + 4im)
  GaussMod{10}(7 + 3im)
 
 julia> rand(Mod{10},2,5)
-2×5 Matrix{Mod{10, Int64}}:
+2×5 Matrix{Mod{10}}:
  Mod{10}(9)  Mod{10}(8)  Mod{10}(1)  Mod{10}(3)  Mod{10}(1)
  Mod{10}(2)  Mod{10}(0)  Mod{10}(9)  Mod{10}(0)  Mod{10}(2)
 ```
@@ -391,7 +391,7 @@ The `Mod` and `GaussMod` types work well with my
 julia> using LinearAlgebraX
 
 julia> A = rand(GaussMod{13},3,3)
-3×3 Matrix{GaussMod{13, Complex{Int64}}}:
+3×3 Matrix{GaussMod{13}}:
  GaussMod{13}(12 + 2im)   GaussMod{13}(3 + 5im)  GaussMod{13}(6 + 11im)
   GaussMod{13}(0 + 4im)   GaussMod{13}(2 + 1im)  GaussMod{13}(12 + 2im)
   GaussMod{13}(6 + 0im)  GaussMod{13}(3 + 11im)   GaussMod{13}(4 + 8im)
@@ -400,13 +400,13 @@ julia> detx(A)
 GaussMod{13}(11 + 5im)
 
 julia> invx(A)
-3×3 Matrix{GaussMod{13, Complex{Int64}}}:
+3×3 Matrix{GaussMod{13}}:
  GaussMod{13}(12 + 11im)  GaussMod{13}(3 + 6im)  GaussMod{13}(12 + 11im)
    GaussMod{13}(2 + 7im)  GaussMod{13}(1 + 3im)    GaussMod{13}(9 + 2im)
    GaussMod{13}(4 + 7im)  GaussMod{13}(8 + 9im)    GaussMod{13}(9 + 1im)
 
 julia> ans * A
-3×3 Matrix{GaussMod{13, Complex{Int64}}}:
+3×3 Matrix{GaussMod{13}}:
  GaussMod{13}(1 + 0im)  GaussMod{13}(0 + 0im)  GaussMod{13}(0 + 0im)
  GaussMod{13}(0 + 0im)  GaussMod{13}(1 + 0im)  GaussMod{13}(0 + 0im)
  GaussMod{13}(0 + 0im)  GaussMod{13}(0 + 0im)  GaussMod{13}(1 + 0im)
