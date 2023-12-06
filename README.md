@@ -10,9 +10,7 @@ With this new version the modulus of a `Mod` number must be of type `Int`.
 If a `Mod` number is constructed with any other typeof `Integer`, the 
 constructor will (try to) convert it to type `Int`.
 
-> Be sure to construct new `Mod` numbers using this syntax: `Mod{N}(v)`. Do *not* use the 
-old style `Mod{N,T}(v)` (where `T` is an `Integer` type). Support for this old style constructor is going to be
-removed. 
+The old style `Mod{N,T}(v)` no longer works. 
 
 ### Why this change?
 
@@ -33,6 +31,8 @@ We believe that the dominant use case for this module will be with moduli betwee
 `2` and `2^63-1` and so we do not expect this change to affect
 users. Further, since `Mod` numbers that required `Int128` moduli were 
 likely to give incorrect results, version 1 of this module was buggy.
+
+Users who require *smaller* integer (e.g., `Int8`) types should use the latest version 1 of `Mods`.
 
 In addition, some functionality has been moved to the `extras` folder. 
 See the `README` there. 
