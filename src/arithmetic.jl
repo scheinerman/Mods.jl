@@ -20,10 +20,23 @@ function is_invertible(a::Mod{N})::Bool where {N}
 end
 is_invertible(a::GaussMod)::Bool = is_invertible(real(a * a'))
 
-inv(a::Mod{N}) where {N} = Mod{N}(invmod(value(a), N))
+function _invmod(x::S, m::T) where {S<:Integer,T<:Integer}
+    (g, v, _) = gcdx(x, m)
+    if g != 1
+        error("Mod{$m}($x) is not invertible")
+    end
+    return v
+end
+
+inv(a::Mod{N}) where {N} = Mod{N}(_invmod(value(a), N))
 function inv(a::GaussMod{N}) where {N}
     d = real(a * a')
-    return inv(d) * a'
+    try
+        result = inv(d) * a'
+        return result
+    catch
+        error("$a is not invertible")
+    end
 end
 
 (/)(a::AbstractMod, b::AbstractMod) = a * inv(b)
