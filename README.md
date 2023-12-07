@@ -63,7 +63,7 @@ julia> 2a
 GaussMod{17}(1 + 13im)
 
 julia> a'
-GaussMod{17}(9 + 2im)
+GaussMod{17}(1 + 4im)
 ```
 
 ## Basics 
