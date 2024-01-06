@@ -21,7 +21,7 @@ end
 
 # Test for equality
 iszero(x::AbstractMod) = iszero(value(x))
-isone(x::AbstractMod) = isone(value(y))
+isone(x::AbstractMod) = isone(value(x))
 (==)(x::AbstractMod, y::AbstractMod) = modulus(x) == modulus(y) && value(x) == value(y)
 (==)(x::AbstractMod, y::T) where {T<:CZQ} = x == Mod{modulus(x)}(y)
 (==)(x::T, y::AbstractMod) where {T<:CZQ} = Mod{modulus(x)}(x) == y
