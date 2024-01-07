@@ -34,6 +34,8 @@ likely to give incorrect results, version 1 of this module was buggy.
 
 Users who require *smaller* integer (e.g., `Int8`) types should use the latest version 1 of `Mods`.
 
+> **NEW!** For `Int8` moduli (between 2 and 127) see the [MiniMods](https://github.com/scheinerman/MiniMods.jl) module.
+
 In addition, some functionality has been moved to the `extras` folder. 
 See the `README` there. 
 
