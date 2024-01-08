@@ -1,5 +1,5 @@
-(+)(a::Mod{N}, b::Mod{N}) where {N} = Mod{N}(widen(value(a) + widen(value(b))))
-(+)(a::GaussMod{N}, b::GaussMod{N}) where {N} = Mod{N}(widen(value(a) + widen(value(b))))
+(+)(a::Mod{N}, b::Mod{N}) where {N} = Mod{N}(widen(value(a)) + widen(value(b)))
+(+)(a::GaussMod{N}, b::GaussMod{N}) where {N} = Mod{N}(widen(value(a)) + widen(value(b)))
 
 (-)(a::Mod{N}) where {N} = Mod{N}(-value(a))
 (-)(a::GaussMod{N}) where {N} = GaussMod{N}(-value(a))
