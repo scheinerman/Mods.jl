@@ -41,7 +41,7 @@ See the `README` there.
 
 ### New in 2.2.3
 
-The values of `Mod` number is held in 64-bit integers. If the moduli and values are 
+The values of `Mod` numbers are held in 64-bit integers. If the moduli and values are 
 large enough, integer arithmetic might overlow and yield incorrect results. To deal
 with this, integer values are expanded to 128 bits in order to ensure correctness,
 and then reduced by the modulus.
