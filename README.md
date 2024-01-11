@@ -50,7 +50,7 @@ In prior versions, we always expanded values to 128 bits before arithmetic.
 
 Starting in version 2.2.3, expansion to 128 bits only happens for moduli above 
 `typemax(Int32)` which equals `2^31 - 1 = 2,147,483,647`. This results in a 
-roughly 4 or 5 times speed compared to prior versions.
+roughly 4 or 5 times speedup compared to prior versions.
 
 
 
