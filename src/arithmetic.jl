@@ -1,14 +1,31 @@
-(+)(a::Mod{N}, b::Mod{N}) where {N} = Mod{N}(widen(value(a)) + widen(value(b)))
-(+)(a::GaussMod{N}, b::GaussMod{N}) where {N} = Mod{N}(widen(value(a)) + widen(value(b)))
+# (+)(a::Mod{N}, b::Mod{N}) where {N} = Mod{N}(widen(a.val) + widen(b.val))
+# (+)(a::GaussMod{N}, b::GaussMod{N}) where {N} = Mod{N}(widen(a.val) + widen(b.val))
 
-(-)(a::Mod{N}) where {N} = Mod{N}(-value(a))
-(-)(a::GaussMod{N}) where {N} = GaussMod{N}(-value(a))
+function (+)(a::Mod{N}, b::Mod{N}) where {N}
+    N <= typemax(Int32) ? Mod{N}(a.val + b.val) : Mod{N}(widen(a.val) + widen(b.val))
+end
+function (+)(a::GaussMod{N}, b::GaussMod{N}) where {N}
+    N <= typemax(Int32) ? Mod{N}((a.val) + (b.val)) :
+    GaussMod{N}(widen(a.val) + widen(b.val))
+end
+
+
+
+(-)(a::Mod{N}) where {N} = Mod{N}(N - a.val)
+(-)(a::GaussMod{N}) where {N} = GaussMod{N}(N - a.val)
 
 (-)(a::AbstractMod, b::AbstractMod) = a + (-b)
 
-(*)(a::Mod{N}, b::Mod{N}) where {N} = Mod{N}(widen(value(a)) * widen(value(b)))
-(*)(a::GaussMod{N}, b::GaussMod{N}) where {N} =
-    GaussMod{N}(widen(value(a)) * widen(value(b)))
+# (*)(a::Mod{N}, b::Mod{N}) where {N} = Mod{N}(widemul(a.val, b.val))
+# (*)(a::GaussMod{N}, b::GaussMod{N}) where {N} = GaussMod{N}(widemul(a.val, b.val))
+
+
+function (*)(a::Mod{N}, b::Mod{N}) where {N}
+    N <= typemax(Int32) ? Mod{N}(a.val * b.val) : Mod{N}(widemul(a.val, b.val))
+end
+function (*)(a::GaussMod{N}, b::GaussMod{N}) where {N}
+    N <= typemax(Int32) ? GaussMod{N}(a.val * b.val) : GaussMod{N}(widemul(a.val, b.val))
+end
 
 """
     is_invertible(a::AbstractMod)::Bool

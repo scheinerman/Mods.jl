@@ -34,10 +34,24 @@ likely to give incorrect results, version 1 of this module was buggy.
 
 Users who require *smaller* integer (e.g., `Int8`) types should use the latest version 1 of `Mods`.
 
-> **NEW!** For `Int8` moduli (between 2 and 127) see the [MiniMods](https://github.com/scheinerman/MiniMods.jl) module.
+> **NEW!** For small moduli (between 2 and 255) see the [MiniMods](https://github.com/scheinerman/MiniMods.jl) module.
 
 In addition, some functionality has been moved to the `extras` folder. 
 See the `README` there. 
+
+### New in 2.2.3
+
+The values of `Mod` number is held in 64-bit integers. If the moduli and values are 
+large enough, integer arithmetic might overlow and yield incorrect results. To deal
+with this, integer values are expanded to 128 bits in order to ensure correctness,
+and then reduced by the modulus.
+
+In prior versions, we always expanded values to 128 bits before arithmetic. 
+
+Starting in version 2.2.3, expansion to 128 bits only happens for moduli above 
+`typemax(Int32)` which equals `2^31 - 1 = 2,147,483,647`. This results in a 
+roughly 4 or 5 times speed compared to prior versions.
+
 
 
 ## Quick Overview
