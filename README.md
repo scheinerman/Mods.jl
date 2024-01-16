@@ -2,57 +2,6 @@
 
 Modular arithmetic for Julia.
 
-## New in Version 2
-
-
-
-With this new version the modulus of a `Mod` number must be of type `Int`.
-If a `Mod` number is constructed with any other typeof `Integer`, the 
-constructor will (try to) convert it to type `Int`.
-
-The old style `Mod{N,T}(v)` no longer works. 
-
-### Why this change?
-
-There were various issues in the earlier version of `Mods` that are 
-resolved by requiring `N` to be of type `Int`.
-
-* Previously `Mod` numbers created with different sorts of integer parameters would 
-be different. So if `N = 17` and `M = 0x11`, then `Mod{N}(1)` would not be interoperable with `Mod{M}(1).`
-
-* The internal storage of the value of the `Mod` numbers could be  different. 
-For example, `Mod{17}(-1)` would store the
-value internally as `-1` whereas `Mod{17}(16)` would store the value as `16`.
-
-* Finally, if the modulus were a large `Int128` number, then arithmetic 
-operations could silently fail. 
-
-We believe that the dominant use case for this module will be with moduli between 
-`2` and `2^63-1` and so we do not expect this change to affect
-users. Further, since `Mod` numbers that required `Int128` moduli were 
-likely to give incorrect results, version 1 of this module was buggy.
-
-Users who require *smaller* integer (e.g., `Int8`) types should use the latest version 1 of `Mods`.
-
-> **NEW!** For small moduli (between 2 and 255) see the [MiniMods](https://github.com/scheinerman/MiniMods.jl) module.
-
-In addition, some functionality has been moved to the `extras` folder. 
-See the `README` there. 
-
-### New in 2.2.3
-
-The values of `Mod` numbers are held in 64-bit integers. If the moduli and values are 
-large enough, integer arithmetic might overflow and yield incorrect results. To deal
-with this, integer values are expanded to 128 bits in order to ensure correctness,
-and then reduced by the modulus.
-
-In prior versions, we always expanded values to 128 bits before arithmetic. 
-
-Starting in version 2.2.3, expansion to 128 bits only happens for moduli above 
-`typemax(Int32)` which equals `2^31 - 1 = 2,147,483,647`. This results in a 
-roughly 4 or 5 times speedup compared to prior versions.
-
-
 
 ## Quick Overview
 This module supports modular values and arithmetic. The moduli are integers (at least 2)
@@ -247,7 +196,11 @@ julia> value(a)
 8
 ```
 
+## Limitations
 
+The modulus and value of a `Mod` number are of type `Int` (or `Complex{Int}` for `GaussMod` numbers). This implies that the largest possible modulus is `typemax(Int)` which equals `2^63-1`
+(assuming a 64-bit system).
+ 
 ### Overflow safety
 
 Integer operations on 64-bit numbers can give results requiring more than
@@ -269,6 +222,14 @@ Mod{1000000000000000000}(76944270305263616)
 julia> Mod{N}(a) * Mod{N}(a)    # but this is correct!
 Mod{1000000000000000000}(0)
 ```
+
+This safety comes at a cost. If the modulus is large then operations may
+require enlarging the values to 128-bits before reducing mod `N`. For multipication, 
+this widening occurs when the modulus exceeds `2^32-1`; for addition, widening occurs
+when the modulus exceeds `2^62-1`.
+
+
+
 
 ## Extras
 
@@ -432,4 +393,54 @@ GaussMod{13}(2 + 8im) + GaussMod{13}(11 + 2im)*x + GaussMod{13}(8 + 2im)*x^2 + G
 ```
 
 
+## Version 2 vs Version 1 of `Mods`
 
+
+
+In version 2 the modulus of a `Mod` number must be of type `Int`.
+If a `Mod` number is constructed with any other typeof `Integer`, the 
+constructor will (try to) convert it to type `Int`.
+
+The old style `Mod{N,T}(v)` no longer works. 
+
+### Why this change?
+
+There were various issues in the earlier version of `Mods` that are 
+resolved by requiring `N` to be of type `Int`.
+
+* Previously `Mod` numbers created with different sorts of integer parameters would 
+be different. So if `N = 17` and `M = 0x11`, then `Mod{N}(1)` would not be interoperable with `Mod{M}(1).`
+
+* The internal storage of the value of the `Mod` numbers could be  different. 
+For example, `Mod{17}(-1)` would store the
+value internally as `-1` whereas `Mod{17}(16)` would store the value as `16`.
+
+* Finally, if the modulus were a large `Int128` number, then arithmetic 
+operations could silently fail. 
+
+We believe that the dominant use case for this module will be with moduli between 
+`2` and `2^63-1` and so we do not expect this change to affect
+users. Further, since `Mod` numbers that required `Int128` moduli were 
+likely to give incorrect results, version 1 of this module was buggy.
+
+
+In addition, some functionality has been moved to the `extras` folder. 
+See the `README` there. In particular, the `CRT` function is no longer part of the `Mods`
+module but resides in `extras/CRT.jl`.
+
+
+### Different modulus types
+
+Since moduli are of type `Int`, a `Mod` numbers uses 8 bytes (and a `GaussMod` uses 16 bytes). A 
+large matrix of `Mod` numbers could unnecessarily use a lot of memory, especially if the moduli
+are small.
+
+Some solutions to this problem:
+
+* Use the latest Version 1 of `Mods`.
+* Create a cloned copy of the `Mods` package and edit this line in the file `Mods.jl`:
+```julia
+const value_type = Int                # storage type for the value in a Mod
+``` 
+to set `value_type` to a smaller type of integer (say, `Int16`).
+* For very small moduli (between 2 and 255) see the [MiniMods](https://github.com/scheinerman/MiniMods.jl) module.

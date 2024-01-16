@@ -1,10 +1,10 @@
 
 struct Mod{N} <: AbstractMod
-    val::Int
+    val::value_type
     function Mod{N}(x::T) where {N,T<:Integer}
         @assert N isa Integer && N > 1 "Modulus must be an integer greater than 1"
-        @assert N <= typemax(Int) "modulus is too large"
-        new{Int(N)}(mod(x, N))
+        @assert N <= max_mod "modulus is too large"
+        new{value_type(N)}(mod(x, N))
     end
 end
 
@@ -25,10 +25,10 @@ mod(z::Complex{<:Integer}, n::Integer) = Complex(mod(real(z), n), mod(imag(z), n
 
 
 struct GaussMod{N} <: AbstractMod
-    val::Complex{Int}
+    val::Complex{value_type}
     function GaussMod{N}(x::Complex{T}) where {N,T<:Integer}
         @assert N isa Integer && N > 1 "Modulus must be an integer greater than 1"
-        @assert N <= typemax(Int) "modulus is too large"
+        @assert N <= max_mod "modulus is too large"
         new{Int(N)}(mod(x, N))
     end
 end

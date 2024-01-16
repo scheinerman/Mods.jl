@@ -14,6 +14,14 @@ CZQ = Union{Complex{<:Integer},Integer,Complex{<:Rational},Rational}
 
 abstract type AbstractMod <: Number end
 
+
+const value_type = Int                # storage type for the value in a Mod
+
+const max_mod = typemax(value_type)   # maximum modulus allowed
+const max_mul = isqrt(max_mod)        # maximum before widening may be necessary for multiplication
+const max_add = max_mod ÷ 2           # maximum before widening may be necessary for addition
+
+
 include("constructors.jl")
 include("basic_functions.jl")
 include("promotion.jl")

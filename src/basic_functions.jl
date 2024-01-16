@@ -1,14 +1,14 @@
 value(a::AbstractMod) = a.val
-modulus(a::Mod{N}) where N = N 
-modulus(a::GaussMod{N}) where N = N
+modulus(a::Mod{N}) where {N} = N
+modulus(a::GaussMod{N}) where {N} = N
 
 abs(a::AbstractMod) = abs(value(a))
 conj(x::Mod{N}) where {N} = x
-conj(x::GaussMod{N}) where N = GaussMod{N}(value(x)')
+conj(x::GaussMod{N}) where {N} = GaussMod{N}(value(x)')
 
 # real & imaginary parts
-real(x::GaussMod{N}) where N = Mod{N}(real(value(x)))
-imag(x::GaussMod{N}) where N = Mod{N}(imag(value(x)))
+real(x::GaussMod{N}) where {N} = Mod{N}(real(value(x)))
+imag(x::GaussMod{N}) where {N} = Mod{N}(imag(value(x)))
 
 
 function hash(x::AbstractMod, h::UInt64 = UInt64(0))

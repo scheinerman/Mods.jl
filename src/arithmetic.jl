@@ -2,10 +2,11 @@
 # (+)(a::GaussMod{N}, b::GaussMod{N}) where {N} = Mod{N}(widen(a.val) + widen(b.val))
 
 function (+)(a::Mod{N}, b::Mod{N}) where {N}
-    N <= typemax(Int32) ? Mod{N}(a.val + b.val) : Mod{N}(widen(a.val) + widen(b.val))
+    N <= max_add ? Mod{N}(a.val + b.val) : Mod{N}(widen(a.val) + widen(b.val))
 end
+
 function (+)(a::GaussMod{N}, b::GaussMod{N}) where {N}
-    N <= typemax(Int32) ? Mod{N}((a.val) + (b.val)) :
+    N <= max_add ? Mod{N}((a.val) + (b.val)) :
     GaussMod{N}(widen(a.val) + widen(b.val))
 end
 
@@ -21,10 +22,10 @@ end
 
 
 function (*)(a::Mod{N}, b::Mod{N}) where {N}
-    N <= typemax(Int32) ? Mod{N}(a.val * b.val) : Mod{N}(widemul(a.val, b.val))
+    N <= max_mul ? Mod{N}(a.val * b.val) : Mod{N}(widemul(a.val, b.val))
 end
 function (*)(a::GaussMod{N}, b::GaussMod{N}) where {N}
-    N <= typemax(Int32) ? GaussMod{N}(a.val * b.val) : GaussMod{N}(widemul(a.val, b.val))
+    N <= max_mul ? GaussMod{N}(a.val * b.val) : GaussMod{N}(widemul(a.val, b.val))
 end
 
 """
