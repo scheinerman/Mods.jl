@@ -2,4 +2,4 @@
 # julia --color=yes --project make.jl
 
 using Documenter, Mods
-makedocs(; sitename="Mods")
+makedocs(; sitename = "Mods")

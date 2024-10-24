@@ -34,5 +34,3 @@ end
 Base.IteratorSize(::Type{GaussMod{m}}) where {m} = Base.HasLength()
 
 Base.length(::Type{GaussMod{m}}) where {m} = m * m
-
-

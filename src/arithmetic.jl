@@ -6,8 +6,7 @@ function (+)(a::Mod{N}, b::Mod{N}) where {N}
 end
 
 function (+)(a::GaussMod{N}, b::GaussMod{N}) where {N}
-    N <= max_add ? Mod{N}((a.val) + (b.val)) :
-    GaussMod{N}(widen(a.val) + widen(b.val))
+    N <= max_add ? Mod{N}((a.val) + (b.val)) : GaussMod{N}(widen(a.val) + widen(b.val))
 end
 
 
