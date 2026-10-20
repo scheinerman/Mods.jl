@@ -119,12 +119,14 @@ end
 
 
 @testset "Iteration" begin
-    @test sum(k for k in Mod{7}) == zero(Mod{7})
-    @test collect(Mod{7}) == Mod{7}.(0:6)
-    @test prod(k for k in Mod{7} if k != 0) == -1  # Wilson's theorem
+    @test sum(k for k in allmods(Mod{7})) == zero(Mod{7})
+    @test collect(allmods(Mod{7})) == Mod{7}.(0:6)
+    @test prod(k for k in allmods(Mod{7}) if k != 0) == -1  # Wilson's theorem
 
     # complex interation
-    @test sum(GaussMod{7}) == 0
+    @test sum(allmods(GaussMod{7})) == 0
+    @test length(allmods(GaussMod{7})) == 49
+    @test eltype(allmods(Mod{7})) == Mod{7}
 end
 
 

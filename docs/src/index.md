@@ -260,9 +260,9 @@ julia> ones(GaussMod{5},4)
 
 ### Iteration
 
-The `Mod{m}` type can be used as an iterator (in `for` statements and list comprehension):
+`allmods(Mod{m})` is an iterator over all elements of `Mod{m}` (usable in `for` statements and list comprehensions):
 ```
-julia> for a in Mod{5}
+julia> for a in allmods(Mod{5})
        println(a)
        end
 Mod{5}(0)
@@ -271,7 +271,7 @@ Mod{5}(2)
 Mod{5}(3)
 Mod{5}(4)
 
-julia> collect(Mod{6})
+julia> collect(allmods(Mod{6}))
 6-element Vector{Mod{6}}:
  Mod{6}(0)
  Mod{6}(1)
@@ -280,7 +280,7 @@ julia> collect(Mod{6})
  Mod{6}(4)
  Mod{6}(5)
 
-julia> [k*k for k ∈ Mod{7}]
+julia> [k*k for k ∈ allmods(Mod{7})]
 7-element Vector{Mod{7}}:
  Mod{7}(0)
  Mod{7}(1)
@@ -290,13 +290,13 @@ julia> [k*k for k ∈ Mod{7}]
  Mod{7}(4)
  Mod{7}(1)
 
-julia> prod(k for k in Mod{5} if k!=0) == -1  # Wilson's theorem
+julia> prod(k for k in allmods(Mod{5}) if k!=0) == -1  # Wilson's theorem
 true
 ```
 
-One can also use `GaussMod` as an iterator:
+Likewise `allmods(GaussMod{m})` iterates over all Gaussian residues:
 ```
-julia> for z in GaussMod{3}
+julia> for z in allmods(GaussMod{3})
        println(z)
        end
 GaussMod{3}(0 + 0im)

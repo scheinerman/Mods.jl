@@ -6,6 +6,7 @@ import Base: hash, iszero, isone, mod, abs, conj, real, imag
 
 export GaussMod, Mod, AbstractMod
 export modulus, value, is_invertible
+export allmods
 
 QZ = Union{<:Rational,<:Integer}
 CZ = Union{Complex,<:Integer}
